@@ -1,0 +1,128 @@
+services:
+  mongo-db:
+    image: mongo:${MONGO_VERSION:-6.0}
+    container_name: urbanpulse-mongo-db
+    command: --nojournal
+    ports:
+      - "${MONGO_DB_PORT:-27017}:27017"
+    volumes:
+      - mongo-db-data:/data/db
+    networks:
+      - urbanpulse-net
+
+  orion-ld:
+    image: fiware/orion-ld:latest
+    container_name: urbanpulse-orion-ld
+    depends_on:
+      - mongo-db
+    command: -dbhost mongo-db -logLevel DEBUG
+    ports:
+      - "${ORION_LD_PORT:-1026}:1026"
+    networks:
+      - urbanpulse-net
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: urbanpulse-mosquitto
+    ports:
+      - "${MQTT_PORT:-1883}:1883"
+    networks:
+      - urbanpulse-net
+
+  iot-agent-json:
+    image: fiware/iotagent-json:latest
+    container_name: urbanpulse-iot-agent-json
+    depends_on:
+      - mongo-db
+      - mosquitto
+    environment:
+      - IOTA_CB_HOST=orion-ld
+      - IOTA_CB_PORT=1026
+      - IOTA_NORTH_PORT=4041
+      - IOTA_REGISTRY_TYPE=mongodb
+      - IOTA_MONGO_HOST=mongo-db
+      - IOTA_MONGO_PORT=27017
+      - IOTA_MONGO_DB=iotagentjson
+      - IOTA_MQTT_HOST=mosquitto
+      - IOTA_MQTT_PORT=1883
+      - IOTA_HTTP_PORT=7896
+      - IOTA_LOG_LEVEL=DEBUG
+    ports:
+      - "${IOTA_NORTH_PORT:-4041}:4041"
+      - "${IOTA_HTTP_PORT:-7896}:7896"
+    networks:
+      - urbanpulse-net
+
+  iot-agent-json-ld:
+    image: fiware/iotagent-json:latest
+    container_name: urbanpulse-iot-agent-json-ld
+    depends_on:
+      - mongo-db
+      - mosquitto
+    environment:
+      - IOTA_CB_HOST=orion-ld
+      - IOTA_CB_PORT=1026
+      - IOTA_NORTH_PORT=4042
+      - IOTA_REGISTRY_TYPE=mongodb
+      - IOTA_MONGO_HOST=mongo-db
+      - IOTA_MONGO_PORT=27017
+      - IOTA_MONGO_DB=iotagentjsonld
+      - IOTA_MQTT_HOST=mosquitto
+      - IOTA_MQTT_PORT=1883
+      - IOTA_HTTP_PORT=7897
+      - IOTA_LOG_LEVEL=DEBUG
+    ports:
+      - "${IOTA_NORTH_PORT_LD:-4042}:4042"
+      - "${IOTA_HTTP_PORT_LD:-7897}:7897"
+    networks:
+      - urbanpulse-net
+
+  crate-db:
+    image: crate:${CRATE_VERSION:-latest}
+    container_name: urbanpulse-crate-db
+    ports:
+      - "${CRATE_HTTP_PORT:-4200}:4200"
+      - "${CRATE_PSQL_PORT:-5432}:5432"
+    command: crate -Cdiscovery.type=single-node
+    volumes:
+      - crate-db-data:/data
+    networks:
+      - urbanpulse-net
+
+  quantumleap:
+    image: fiware/quantumleap:${QUANTUMLEAP_VERSION:-latest}
+    container_name: urbanpulse-quantumleap
+    depends_on:
+      - crate-db
+    environment:
+      - CRATE_HOST=crate-db
+      - CRATE_PORT=5432
+      - QL_LOGLEVEL=DEBUG
+    ports:
+      - "${QUANTUMLEAP_PORT:-8668}:8668"
+    networks:
+      - urbanpulse-net
+
+  grafana:
+    image: grafana/grafana-oss:${GRAFANA_VERSION:-latest}
+    container_name: urbanpulse-grafana
+    depends_on:
+      - crate-db
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - urbanpulse-net
+
+volumes:
+  mongo-db-data:
+  crate-db-data:
+  grafana-data:
+
+networks:
+  urbanpulse-net:
+    driver: bridge
