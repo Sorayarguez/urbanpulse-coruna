@@ -137,4 +137,42 @@ Originalidad	Fusión única GreenRoute + UrbanPulse + EcoZones. LLM local explic
 Variedad entidades	8 modelos NGSI-LD con Relationship entre todos ellos. Cross-sector: Device + Environment + Transportation.
 Visualizaciones	4 tecnologías distintas: Leaflet heatmap, ChartJS dual-axis, ThreeJS 3D volumétrico, Grafana histórico.
 Tecnologías	FastAPI + ML (RF+LSTM) + LLM local + IoT Agent MQTT + QuantumLeap + Docker + GeoPandas.
+
+Funcionalidades adicionales
+Índice de Presión Urbana (IPU)
+Score compuesto por zona calculado en tiempo real:
+IPU = w1·(tráfico_normalizado)
++ w2·(flujo_peatonal_normalizado)
++ w3·(NO₂_normalizado)
++ w4·(ruido_normalizado)
+Entidades involucradas:
+TrafficFlowObserved → componente vehicular
+ItemFlowObserved → componente peatonal/ciclista
+AirQualityObserved → componente atmosférico
+NoiseLevelObserved → componente acústico
+TrafficEnvironmentImpact → resultado del IPU por zona
+El IPU alimenta directamente EcoZones para decidir
+activación de ZBE y GreenRoute para ponderar rutas.
+Funcionalidad adicional: Simulador de escenarios ZBE
+Usando TrafficEnvironmentImpactForecast, el panel EcoZones
+permite simular: "Si activamos ZBE en zona X mañana 8-10h,
+el NO₂ previsto baja de 89 µg/m³ a 52 µg/m³ (-42%)".
+Visualizado en ThreeJS como comparativa before/after.
+Modelo transversal: WeatherObserved
+Añadir WeatherObserved (temperatura, velocidad/dirección
+del viento, humedad) como feature del modelo ML y como
+contexto para el LLM explicativo. El viento en A Coruña
+es el principal factor de dispersión de contaminantes.
+Features ML adicionales: wind_speed, wind_direction,
+temperature, humidity.
+GreenRoute — algoritmo concreto
+Cargar grafo de calles de A Coruña con osmnx
+Para cada arista del grafo, calcular índice de
+salubridad = f(AirQuality, Noise, Traffic) del
+sensor más cercano (interpolación IDW)
+Shortest path con networkx usando peso =
+1/índice_salubridad (minimizar exposición)
+Comparar ruta saludable vs ruta más corta:
+mostrar diferencia en tiempo (+X min) y ganancia
+en salud (-Y% exposición NO₂)
  
