@@ -301,3 +301,20 @@ Detalles:
 - Capacidad de monitorizacion en tiempo real de las seis zonas de sensores definidas.
 - Generacion de predicciones 6/12/24h y explicaciones accionables para decision municipal.
 - Experiencia ciudadana mobile-first util para ruta y exposicion diaria.
+
+## 9. Estado de implementacion - Issue #1
+
+### 9.1 Objetivo de la entrega
+Implementar la infraestructura FIWARE NGSI-LD base para habilitar ingesta, gestion de contexto, historizacion y visualizacion inicial.
+
+### 9.2 Entregables tecnicos
+- Stack base en `docker-compose.yml` con Orion-LD, IoT Agent JSON, QuantumLeap, CrateDB y Grafana.
+- Configuracion centralizada en `.env` para puertos, versiones y credenciales.
+- Script operativo `services/healthcheck.sh` para validar disponibilidad de servicios.
+- Provision de suscripcion Orion-LD -> QuantumLeap para todas las entidades del modelo.
+
+### 9.3 Criterios de aceptacion de infraestructura
+- El despliegue con `docker compose --env-file .env up -d` finaliza sin errores.
+- `services/healthcheck.sh` devuelve codigo de salida 0 con todos los servicios en estado OK.
+- Existe al menos una suscripcion activa en Orion-LD que notifica a `http://quantumleap:8668/v2/notify`.
+- La suscripcion incluye todos los tipos de entidad definidos en `docs/data_model.md`.

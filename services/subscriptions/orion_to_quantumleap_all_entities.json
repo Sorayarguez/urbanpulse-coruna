@@ -1,0 +1,59 @@
+{
+  "description": "UrbanPulse Orion-LD to QuantumLeap subscription for all NGSI-LD model entities",
+  "type": "Subscription",
+  "entities": [
+    { "type": "TrafficFlowObserved" },
+    { "type": "ItemFlowObserved" },
+    { "type": "TrafficEnvironmentImpact" },
+    { "type": "TrafficEnvironmentImpactForecast" },
+    { "type": "AirQualityObserved" },
+    { "type": "NoiseLevelObserved" },
+    { "type": "Device" },
+    { "type": "DeviceModel" }
+  ],
+  "notification": {
+    "attributes": [
+      "id",
+      "type",
+      "dateObserved",
+      "dateObservedFrom",
+      "dateObservedTo",
+      "dateIssued",
+      "validFrom",
+      "validTo",
+      "intensity",
+      "occupancy",
+      "averageSpeed",
+      "maxSpeed",
+      "minSpeed",
+      "congested",
+      "traffic",
+      "impactScore",
+      "persistedOver2h",
+      "predictedNO2",
+      "predictedPM25",
+      "predictedImpactScore",
+      "confidenceLow",
+      "confidenceHigh",
+      "no2",
+      "pm25",
+      "o3",
+      "co",
+      "LAeq",
+      "LAmax",
+      "LAS",
+      "noiseIndex",
+      "deviceState",
+      "dateLastValueReported",
+      "location"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://quantumleap:8668/v2/notify",
+      "accept": "application/json"
+    }
+  },
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ]
+}

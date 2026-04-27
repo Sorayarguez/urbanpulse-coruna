@@ -273,3 +273,19 @@ flowchart TB
 - Orion-LD, IoT Agents, Mosquitto, QuantumLeap, CrateDB y Grafana estan ya definidos en docker-compose.
 - FastAPI, Frontend y Ollama se documentan como componentes objetivo para cerrar el alcance funcional completo.
 - La arquitectura mantiene consistencia NGSI-LD en todas las rutas de datos.
+
+## 9. Implementacion base (Issue #1)
+
+### 9.1 Configuracion operativa
+- Se usa `.env` como fuente de configuracion de puertos, versiones y credenciales.
+- `docker-compose.yml` incorpora `restart: unless-stopped` y `healthcheck` por servicio base.
+- Las dependencias entre servicios se definen con condicion de salud para mejorar el arranque.
+
+### 9.2 Validacion de servicios
+- Script de comprobacion: `services/healthcheck.sh`.
+- Verifica contenedores activos y endpoints HTTP de Orion-LD, IoT Agent JSON, QuantumLeap, CrateDB y Grafana.
+
+### 9.3 Historizacion Orion -> QuantumLeap
+- Payload de suscripcion: `services/subscriptions/orion_to_quantumleap_all_entities.json`.
+- Script idempotente de provision: `services/create_orion_subscription.sh`.
+- Endpoint de notificacion interno: `http://quantumleap:8668/v2/notify`.
