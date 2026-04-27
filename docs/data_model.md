@@ -306,3 +306,22 @@ graph TD
 - F3: genera TrafficEnvironmentImpactForecast a partir de historicos e impacto observado.
 - F4/F6: explicaciones y alertas sobre entidades ambientales e impacto.
 - F7: consumo simplificado de indicadores para interfaz ciudadana.
+
+## 8. Cobertura de suscripcion Orion-LD -> QuantumLeap
+
+La infraestructura base define una suscripcion NGSI-LD para historizacion que cubre todas las entidades del modelo:
+
+- TrafficFlowObserved
+- ItemFlowObserved
+- TrafficEnvironmentImpact
+- TrafficEnvironmentImpactForecast
+- AirQualityObserved
+- NoiseLevelObserved
+- Device
+- DeviceModel
+
+Artefactos de implementacion:
+- `services/subscriptions/orion_to_quantumleap_all_entities.json`
+- `services/create_orion_subscription.sh`
+
+Con esta cobertura, cualquier actualizacion de entidades en Orion-LD puede fluir hacia QuantumLeap y persistirse en CrateDB para analitica historica.
