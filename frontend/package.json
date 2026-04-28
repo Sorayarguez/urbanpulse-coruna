@@ -1,0 +1,23 @@
+{
+  "name": "urbanpulse-frontend",
+  "version": "1.0.0",
+  "description": "UrbanPulse Coruña - Responsive web frontend with Leaflet, ChartJS and ThreeJS",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "leaflet.heat": "^0.2.0",
+    "chart.js": "^4.4.0",
+    "three": "^r164",
+    "socket.io-client": "^4.7.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-vue": "^5.0.0"
+  }
+}
