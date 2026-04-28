@@ -11,7 +11,6 @@ import os
 from pathlib import Path
 
 import uvicorn
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 # Reuse the existing FastAPI app implemented in backend/main.py
@@ -22,16 +21,8 @@ ROOT = Path(__file__).parent
 FRONTEND_DIR = ROOT / "frontend"
 
 if FRONTEND_DIR.exists():
-    # Serve frontend assets under /static
-    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
-
-
-@app.get("/")
-def _root() -> FileResponse | dict:
-    index = FRONTEND_DIR / "index.html"
-    if index.exists():
-        return FileResponse(str(index))
-    return {"message": "Frontend not found. Backend API available under /api"}
+    # Serve the frontend at the site root so relative asset URLs keep working.
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 
 
 if __name__ == "__main__":
