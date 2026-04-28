@@ -359,3 +359,155 @@ Implementar el backend FastAPI como capa de orquestacion que exponga API REST pa
 - OllamaExplainer construye prompt con contexto actual + historico 6h + forecast y llama Mistral.
 - Todos los clientes son inicializados al startup de FastAPI y reutilizados en rutas.
 - Las rutas actuan como orquestadores de logica, no contienen SQL o NGSI-LD directo.
+<<<<<<< Updated upstream
+=======
+
+## 11. Estado de implementacion - Issue #4: Frontend Web Responsivo con Leaflet, ChartJS y ThreeJS
+
+### 11.1 Objetivo de la entrega
+Implementar frontend web responsivo mobile-first que ofrezca visualización integrada de monitoreo ambiental urbano con mapa interactivo (Leaflet + heatmap dual mode), gráficos de correlación trafico-contaminación (ChartJS con ejes duales y bandas de confianza), visor 3D inmersivo (ThreeJS con edificios extruidos y nube volumétrica de contaminación), y panel LLM para explicaciones automáticas en español.
+
+### 11.2 Entregables técnicos
+- **frontend/index.html**: Single-page template responsivo con layout 3 columnas (sidebar | map | metrics), tema oscuro profesional.
+- **frontend/package.json**: Dependencias (Leaflet, ChartJS, ThreeJS, Socket.io).
+- **frontend/css/theme.css**: Paleta oscura profesional (#0a0e27, #12152b, acentos #00d4ff), variables CSS, componentes reutilizables.
+- **frontend/css/layout.css**: Grid layout responsive con breakpoints (320px/480px/768px/1024px/1440px).
+- **frontend/js/main.js**: Punto de entrada de la aplicación, inicialización de módulos, manejo de eventos.
+- **frontend/js/api.js**: Wrapper HTTP con caché (TTL configurable) para todos los endpoints backend.
+- **frontend/js/websocket.js**: Cliente Socket.io con reconexión automática, fallback a simulación de datos.
+- **frontend/js/map.js**: Leaflet map centrado en A Coruña, marcadores dinámicos, heatmap dual mode (real-time/histórico 24h).
+- **frontend/js/sidebar.js**: Lista de sensores, controles de capas (toggle heatmap, toggle marcadores, radio modo), alertas, interacciones.
+- **frontend/js/charts.js**: ChartJS con 3 gráficos: dual-axis (tráfico vs NO₂), evolución 24h, radar chart índices ambientales.
+- **frontend/js/viewer3d.js**: ThreeJS escena con edificios procedurales, nube volumétrica de contaminación animada, time-lapse 24h.
+- **frontend/js/llm-panel.js**: Panel integrado en sidebar para explicaciones LLM con caché, POST /api/explain, fallback heurístico.
+
+### 11.3 Características Implementadas
+
+#### 11.3.1 Layout Responsivo Mobile-First
+- **3 columnas adaptive**: Sidebar (sensores/controles) | Mapa central | Panel métricas (charts/3D)
+- **Breakpoints**: Mobile < 768px (stack vertical, sidebar colapsable), Tablet 768-1024px (2-col), Desktop > 1024px (3-col)
+- **Componentes responsive**: Botones 44px min tap target, fuentes escaladas (14px mobile, 16px desktop)
+- **No horizontal scroll** en ningún breakpoint, viewport meta tag configurado
+
+#### 11.3.2 Tema Oscuro Profesional
+- **Paleta**: Fondo #0a0e27, secundario #12152b, terciario #1a1f3a
+- **Acentos**: Azul ciano #00d4ff (primario), naranja #ff6b6b (alertas), verde #4ade80 (ok)
+- **Tipografía**: System fonts (Segoe UI, Roboto, Oxygen), line-height 1.5, responsive font-sizing
+- **Transiciones smooth**: 150-500ms ease-in-out, animaciones (fadeIn, slideInUp, pulse)
+- **Componentes**: Botones hover/active, cards con sombra, inputs focus personalizado, scrollbar oscuro
+
+#### 11.3.3 Mapa Leaflet + Heatmap Dual Mode
+- **Mapa base**: Leaflet + OpenStreetMap, centrado en 43.3713, -8.4194, zoom 13
+- **Marcadores de sensores**: 6 marcadores dinámicos con iconos color según severidad NO₂ (verde/naranja/rojo)
+## 12. Entrypoint unificado
+
+- **Descripción**: Se ha añadido `app.py` en la raíz del proyecto que reutiliza el `FastAPI` definido en `backend/main.py`. `app.py` monta la carpeta `frontend/` como archivos estáticos y expone la interfaz principal en la ruta `/` mientras mantiene todos los endpoints backend en `/api`.
+- **Ejecución**: Ejecutar `python3 app.py` y abrir `http://localhost:8000`.
+- **Visualizaciones integradas**: Mapa Leaflet, gráficas ChartJS (correlación y predicción), visor 3D (ThreeJS) y panel LLM para explicaciones.
+- **Notas**: La lógica de negocio, configuración y CORS se reutilizan desde `backend/` sin duplicar código.
+- **Popup interactivo**: Muestra NO₂, PM2.5, tráfico, ruido, impacto + botón "Ver detalles"
+- **Dual heatmap modes**:
+  - `real-time`: Actualiza cada 5-10s con valores actuales de sensores
+  - `historical`: Agrega datos 24h por sensor, interpola mapa de calor suave
+  - Toggle radio button para cambiar modo
+- **Control de capas**: Checkbox toggle heatmap visibility, checkbox toggle marcadores
+- **Actualización en tiempo real** vía WebSocket events (sensor_update)
+
+#### 11.3.4 Gráficos ChartJS con Correlación y Predicción
+- **Chart 1: Tráfico vs NO₂ (Dual-axis)**:
+  - Eje Y izquierdo: NO₂ línea roja + banda confianza (relleno transparente, borde punteado)
+  - Eje Y derecho: Tráfico barras azul ciano
+  - Datos: 24h histórico + predicción 6/12/24h (líneas punteadas)
+  - Tooltips personalizados oscuros, leyenda interactiva
+- **Chart 2: Evolución 24h**:
+  - Línea NO₂ histórico vs 3 predicciones con colores distintos
+  - Eje X horas 0-24, eje Y NO₂ 0-150 µg/m³
+- **Chart 3: Radar chart índices ambientales**:
+  - 5 ejes: NO₂, PM2.5, Ruido, Tráfico, Impacto
+  - Valores normalizados 0-100
+  - Actualiza en tiempo real en dataset
+
+#### 11.3.5 Visor 3D Inmersivo con ThreeJS
+- **Geometría urbana**:
+  - Grid 10x10 de edificios procedurales (altura 20-200m)
+  - Colores variables por land-use, materiales con metalness/roughness
+  - Plano de terreno con textura oscura
+- **Iluminación**: Ambient light, directional sun light (sombras), hemisphere light
+- **Nube volumétrica de contaminación**:
+  - 2000 partículas con colores verde→amarillo→rojo por intensidad NO₂
+  - Opacidad interpolada según valores actuales de sensores
+  - Rotación animada
+- **Marcadores de sensores**:
+  - Esferas azul ciano en ubicaciones lat/lon (proyección Web Mercator)
+  - Animaciones TWEEN.js (bounce suave)
+- **Time-lapse mode**:
+  - Slider timeline 0-24h
+  - Play button anima automáticamente 24h en 30s
+  - Nube volumétrica cambia color con la hora histórica
+  - Cargas datos históricos de 3 primeros sensores
+- **Controles cámara**: Orbit (mouse drag/touch swipe), zoom (scroll/pinch), reset a home view
+- **Responsive**: Canvas llena espacio disponible, resize automático
+
+#### 11.3.6 Panel LLM Explainer
+- **Integrado en sidebar**: Sección desplegable con explicación IA
+- **Trigger**: Click automático o botón "Explicación IA" en selección sensor
+- **Petición**: POST /api/explain con {sensor_id, include_history_hours: 6}
+- **Renderizado**: Texto español con fuente, timestamp, botón refrescar
+- **Caché**: 2 minutos por sensor (no re-query frecuente)
+- **Fallback**: Explanation heurística si Ollama no disponible
+- **Indicador fuente**: "🤖 Ollama" o "⚙️ Heurístico"
+
+#### 11.3.7 Integración Tiempo Real
+- **WebSocket Socket.io**: Conexión a `http://localhost:5173` para eventos en vivo
+- **Eventos escuchados**: `sensor_update`, `forecast_update`, `alert_new`, `alert_resolved`, `llm_response`
+- **Fallback simulación**: Si WebSocket no disponible, simula datos cada 5 segundos
+- **Indicador estado**: LED online/offline en header
+
+#### 11.3.8 Interfaz Sidebar
+- **Lista de sensores**: 6 elementos con nombre, NO₂ actual, score impacto
+- **Estados activo**: Highlighting sensor seleccionado, centra mapa
+- **Sección alertas**: Lista scrollable de alertas activas con severidad (color)
+- **Mobile**: Sidebar colapsable hamburger button, cierra al seleccionar sensor
+
+### 11.4 Criterios de Aceptación Frontend
+- **CA-FE-01**: Layout responsive valida en 320px, 480px, 768px, 1024px, 1440px sin scroll horizontal
+- **CA-FE-02**: Mapa Leaflet centra en A Coruña, muestra 6 marcadores, heatmap renderiza con color gradient
+- **CA-FE-03**: Heatmap dual mode: toggle real-time/histórico cambia datos y visualización
+- **CA-FE-04**: Gráfico dual-axis muestra tráfico + NO₂ + banda confianza, tooltips funcionan
+- **CA-FE-05**: Gráfico radar actualiza en tiempo real con datos sensor seleccionado
+- **CA-FE-06**: Visor 3D carga: edificios procedurales visibles, nube volumétrica coloreada por NO₂, time-lapse reproduce 24h
+- **CA-FE-07**: Panel LLM click sensor → POST /api/explain → renderiza texto español < 3s
+- **CA-FE-08**: WebSocket conecta y actualiza heatmap en tiempo real, o fallback a simulación
+- **CA-FE-09**: Tema oscuro consistente, botones 44px mín, accesibilidad WCAG A nivel base
+- **CA-FE-10**: Controles cámara 3D funcionan (orbit mouse, zoom scroll, pinch móvil)
+
+### 11.5 Stack Técnico Frontend
+- **Plantilla**: HTML5 semántico, meta viewport responsivo
+- **Estilos**: CSS3 con Grid/Flexbox, variables CSS, media queries breakpoints, SCSS-ready
+- **Mapeo**: Leaflet 1.9.x + OpenStreetMap + Leaflet.heat 0.2.x
+- **Gráficos**: ChartJS 4.x con múltiples types (bar, line, radar)
+- **3D**: ThreeJS r164 con geometrías estándar, iluminación, TWEEN.js animaciones
+- **Comunicación**: Socket.io 4.x + HTTP fetch con caché local
+- **Build**: Vite 5.x (dev server, producción build)
+
+### 11.6 Arquitectura Interna
+- **main.js**: Inicializa secuencialmente map → sidebar → charts → 3D viewer → LLM panel
+- **api.js**: Capa abstracta HTTP con caché TTL y error handling
+- **websocket.js**: Maneja conexión Socket.io y emite eventos internos
+- **map.js**: Instancia Leaflet, gestiona marcadores y heatmap, reacciona a eventos WebSocket
+- **charts.js**: Crea 3 instancias ChartJS, vinculadas a eventos sensor-selected y WebSocket
+- **viewer3d.js**: Escena ThreeJS inicializada, carga datos histórico para time-lapse, renderiza en animation loop
+- **sidebar.js**: Observa DOM, vinculado a map.selectSensor, carga alertas, actualiza lista en tiempo real
+- **llm-panel.js**: Observa sensor-selected event, cachea respuestas, renderiza explicación
+
+### 11.7 Dependencias Externas Asumidas
+- Backend corriendo en `http://localhost:8000` con endpoints /api/sensors, /api/forecast, /api/explain, etc.
+- Socket.io servidor opcional en `http://localhost:5173` (fallback simulación si no disponible)
+- Ollama disponible en `http://localhost:11434` para LLM (fallback heurístico si no disponible)
+
+### 11.8 Siguientes Pasos
+- Instalar dependencias: `npm install` en carpeta frontend/
+- Desarrollar con `npm run dev` (Vite dev server)
+- Build producción: `npm run build`
+- Servir static build con web server (nginx, Apache, etc.)
+>>>>>>> Stashed changes
