@@ -152,17 +152,15 @@ ${error.stack || ''}
 /**
  * Application ready check
  */
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('📄 DOM loaded, starting initialization...');
+function bootApp() {
+    console.log('📄 DOM ready, starting initialization...');
     initializeApp();
-});
+}
 
-// Also handle if script loads after DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
+    document.addEventListener('DOMContentLoaded', bootApp, { once: true });
 } else {
-    // DOM is already ready
-    initializeApp();
+    bootApp();
 }
 
 // Log to console

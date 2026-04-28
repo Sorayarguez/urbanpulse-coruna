@@ -23,8 +23,10 @@ let historicalData = {};
  * Initialize Leaflet map
  */
 export async function initializeMap(containerId = 'map') {
+    const container = await resolveMapContainer(containerId);
+
     // Create map
-    map = L.map(containerId).setView(CORUNA_CENTER, MAP_ZOOM);
+    map = L.map(container).setView(CORUNA_CENTER, MAP_ZOOM);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -38,31 +40,8 @@ export async function initializeMap(containerId = 'map') {
     layerControl.addTo(map);
 
     // Initialize heatmap layers
-    heatmapLive = L.heatLayer([], {
-        max: 150,
-        radius: 50,
-        blur: 20,
-        gradient: {
-            0.0: '#00ff00',   // Green
-            0.25: '#ffff00',  // Yellow
-            0.5: '#ff9900',   // Orange
-            0.75: '#ff6600',  // Dark Orange
-            1.0: '#ff0000'    // Red
-        }
-    });
-
-    heatmapHistorical = L.heatLayer([], {
-        max: 150,
-        radius: 50,
-        blur: 20,
-        gradient: {
-            0.0: '#00ff00',
-            0.25: '#ffff00',
-            0.5: '#ff9900',
-            0.75: '#ff6600',
-            1.0: '#ff0000'
-        }
-    });
+    heatmapLive = createHeatLayer();
+    heatmapHistorical = createHeatLayer();
 
     // Load sensors
     await loadSensors();
@@ -71,6 +50,49 @@ export async function initializeMap(containerId = 'map') {
     setupMapEventListeners();
 
     return map;
+}
+
+function createHeatLayer() {
+    if (typeof L.heatLayer === 'function') {
+        return L.heatLayer([], {
+            max: 150,
+            radius: 50,
+            blur: 20,
+            gradient: {
+                0.0: '#00ff00',
+                0.25: '#ffff00',
+                0.5: '#ff9900',
+                0.75: '#ff6600',
+                1.0: '#ff0000'
+            }
+        });
+    }
+
+    const fallbackLayer = L.layerGroup();
+    fallbackLayer.setLatLngs = () => fallbackLayer;
+    return fallbackLayer;
+}
+
+async function resolveMapContainer(containerId) {
+    const directContainer = typeof containerId === 'string'
+        ? document.getElementById(containerId)
+        : containerId;
+
+    if (directContainer) {
+        return directContainer;
+    }
+
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
+    const retryContainer = typeof containerId === 'string'
+        ? document.getElementById(containerId)
+        : containerId;
+
+    if (retryContainer) {
+        return retryContainer;
+    }
+
+    throw new Error(`Map container not found: ${containerId}`);
 }
 
 /**
@@ -185,6 +207,10 @@ function createPopupContent(sensor, state) {
  */
 export async function updateHeatmap() {
     try {
+        if (!heatmapLive || typeof heatmapLive.setLatLngs !== 'function') {
+            return;
+        }
+
         if (heatmapMode === 'realtime') {
             const points = [];
             

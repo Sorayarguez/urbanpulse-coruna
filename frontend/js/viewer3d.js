@@ -21,6 +21,20 @@ export async function initializeViewer3D() {
     const container = document.getElementById('canvas-3d');
     if (!container) return;
 
+    if (typeof THREE === 'undefined') {
+        container.innerHTML = `
+            <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #cbd5e1; background: #0a0e27; border: 1px solid #2d3748; border-radius: 12px; padding: 24px; text-align: center;">
+                <div>
+                    <h3 style="margin: 0 0 8px 0; color: #00d4ff;">Visor 3D no disponible</h3>
+                    <p style="margin: 0;">Three.js no se cargó en este navegador. La aplicación sigue funcionando sin la vista 3D.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    ensureTweenShim();
+
     // Scene setup
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0e27);
@@ -444,6 +458,32 @@ function onWindowResize() {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
+}
+
+function ensureTweenShim() {
+    if (typeof window.TWEEN !== 'undefined' && typeof window.TWEEN.Tween === 'function') {
+        return window.TWEEN;
+    }
+
+    class NoopTween {
+        constructor() {}
+        to() { return this; }
+        easing() { return this; }
+        repeat() { return this; }
+        start() { return this; }
+    }
+
+    window.TWEEN = {
+        Tween: NoopTween,
+        Easing: {
+            Sinusoidal: {
+                InOut: (value) => value,
+            },
+        },
+        update() {},
+    };
+
+    return window.TWEEN;
 }
 
 /**
