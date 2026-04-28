@@ -405,6 +405,13 @@ Implementar frontend web responsivo mobile-first que ofrezca visualización inte
 - **Ejecución**: Ejecutar `python3 app.py` y abrir `http://localhost:8000`.
 - **Visualizaciones integradas**: Mapa Leaflet, gráficas ChartJS (correlación y predicción), visor 3D (ThreeJS) y panel LLM para explicaciones.
 - **Notas**: La lógica de negocio, configuración y CORS se reutilizan desde `backend/` sin duplicar código.
+
+### 12.1 Visualizaciones implementadas en la entrega
+
+- **Mapa operativo**: visualización Leaflet centrada en A Coruña con marcadores de sensores y capa de calor ambiental.
+- **Panel analítico**: gráficas ChartJS para tráfico vs NO2, evolución temporal y radar de índices ambientales.
+- **Visor inmersivo**: módulo 3D con ThreeJS integrado en la interfaz principal para exploración espacial.
+- **Panel explicativo**: componente LLM que consume `/api/explain` y presenta interpretación en lenguaje natural.
 - **Popup interactivo**: Muestra NO₂, PM2.5, tráfico, ruido, impacto + botón "Ver detalles"
 - **Dual heatmap modes**:
   - `real-time`: Actualiza cada 5-10s con valores actuales de sensores

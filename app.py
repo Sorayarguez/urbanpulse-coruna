@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
 Unified entrypoint for UrbanPulse Coruña.
-Run `python3 app.py` to start a server at http://localhost:8000
-This reuses the FastAPI `app` defined in `backend/main.py` and mounts
-the `frontend/` directory as static files. It does not duplicate backend logic.
+
+Run `python3 app.py` to start a server at http://localhost:8000.
+This module reuses the FastAPI app already defined in `backend/main.py`,
+keeps existing API routes untouched, and serves the web frontend from `frontend/`.
 """
 from __future__ import annotations
 
