@@ -318,3 +318,44 @@ Implementar la infraestructura FIWARE NGSI-LD base para habilitar ingesta, gesti
 - `services/healthcheck.sh` devuelve codigo de salida 0 con todos los servicios en estado OK.
 - Existe al menos una suscripcion activa en Orion-LD que notifica a `http://quantumleap:8668/v2/notify`.
 - La suscripcion incluye todos los tipos de entidad definidos en `docs/data_model.md`.
+
+## 10. Estado de implementacion - Issue #3: Backend FastAPI con ML y LLM
+
+### 10.1 Objetivo de la entrega
+Implementar el backend FastAPI como capa de orquestacion que exponga API REST para el frontend, integre contexto NGSI-LD de Orion-LD, consulte historicos de QuantumLeap/CrateDB, genere predicciones ML y produzca explicaciones automaticas en español con Ollama local.
+
+### 10.2 Entregables tecnicos
+- **backend/main.py**: FastAPI con 6 endpoints REST, middleware CORS, orquestacion de clientes.
+- **backend/orion_client.py**: cliente NGSI-LD para consultas de estado actual a Orion-LD.
+- **backend/quantumleap_client.py**: cliente CrateDB para series historicas.
+- **backend/ml_model/train.py**: pipeline de entrenamiento RandomForest con 13 features y 3 targets.
+- **backend/ml_model/predict.py**: generacion de entidades TrafficEnvironmentImpactForecast NGSI-LD.
+- **backend/llm/explainer.py**: llamada a Ollama Mistral local con fallback heurístico.
+- **backend/config.py**: configuracion de settings por variables de entorno.
+- **backend/common.py**: utilidades NGSI-LD, helpers de feature engineering y constantes.
+- **backend/requirements.txt**: dependencias (fastapi, uvicorn, requests, scikit-learn, numpy).
+
+### 10.3 Endpoints Implementados
+- GET /api/sensors — lista de sensores con estado actual (traffic, air quality, noise, impact)
+- GET /api/sensors/{id}/history — series historicas por sensor (filtrable por horas)
+- GET /api/impact — impacto ambiental observado por zona
+- GET /api/forecast — predicciones 6/12/24h con confianza
+- GET /api/alerts — alertas activas (NO2 > 40, impact > 70, noise > 65)
+- POST /api/explain — explicacion en español con contexto actual + historico + forecast
+
+### 10.4 Criterios de aceptacion de backend
+- El backend arranca sin errores con `python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000`.
+- GET /api/sensors devuelve 200 con lista de 6 sensores y sus metricas actuales.
+- GET /api/sensors/{id}/history devuelve 200 con serie temporal por sensor.
+- GET /api/forecast devuelve 200 con predicciones para horizontes 6, 12, 24h.
+- POST /api/explain devuelve 200 con explicacion en español < 3 segundos.
+- Headers CORS permiten acceso desde origen frontend (* o configurado).
+- El modelo ML se entrena automaticamente si no existe artefacto o se fuerza entrenamiento.
+- Ollama fallback devuelve explicacion heurística cuando LLM no disponible.
+
+### 10.5 Arquitectura Interna
+- OrionClient y QuantumLeapClient encapsulan acceso a datos con manejo de timeouts.
+- MLModel (RandomForest) predice NO2, PM2.5, impactScore usando 13 features.
+- OllamaExplainer construye prompt con contexto actual + historico 6h + forecast y llama Mistral.
+- Todos los clientes son inicializados al startup de FastAPI y reutilizados en rutas.
+- Las rutas actuan como orquestadores de logica, no contienen SQL o NGSI-LD directo.

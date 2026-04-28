@@ -13,8 +13,8 @@ Capas objetivo:
 - Frontend + Grafana
 
 La plataforma mantiene dos niveles de referencia:
-- Estado desplegado actual: servicios presentes en docker-compose.
-- Arquitectura objetivo: incluye backend FastAPI, frontend y Ollama para completar todas las funcionalidades del contexto.
+- Estado desplegado actual: servicios presentes en docker-compose + backend FastAPI (Issue #3).
+- Arquitectura objetivo: incluye frontend y Ollama para completar todas las funcionalidades del contexto.
 
 ## 2. Diagrama de arquitectura completo (Mermaid)
 
@@ -270,9 +270,22 @@ flowchart TB
 
 ## 8. Notas de implementacion
 
-- Orion-LD, IoT Agents, Mosquitto, QuantumLeap, CrateDB y Grafana estan ya definidos en docker-compose.
-- FastAPI, Frontend y Ollama se documentan como componentes objetivo para cerrar el alcance funcional completo.
+- Orion-LD, IoT Agents, Mosquitto, QuantumLeap, CrateDB y Grafana estan definidos en docker-compose.
+- FastAPI backend esta implementado (Issue #3) con endpoints REST, integracion NGSI-LD, ML y LLM.
+- Frontend y Ollama se documentan como componentes objetivo para cerrar el alcance funcional completo.
 - La arquitectura mantiene consistencia NGSI-LD en todas las rutas de datos.
+
+## 9. Implementaciones Completadas
+
+### Issue #3: Backend FastAPI con ML y LLM
+- ✅ Endpoints REST completos (sensors, impact, forecast, alerts, explain)
+- ✅ Integración NGSI-LD con Orion-LD
+- ✅ Consultas a QuantumLeap/CrateDB para historicos
+- ✅ Pipeline ML con RandomForest para predicción 6/12/24h
+- ✅ Explicaciones en español con Ollama Mistral local
+- ✅ CORS habilitado para frontend
+- ✅ Configuración por variables de entorno
+- Localización: `backend/`
 
 ## 9. Implementacion base (Issue #1)
 

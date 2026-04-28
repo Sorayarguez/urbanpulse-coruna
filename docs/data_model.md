@@ -325,3 +325,24 @@ Artefactos de implementacion:
 - `services/create_orion_subscription.sh`
 
 Con esta cobertura, cualquier actualizacion de entidades en Orion-LD puede fluir hacia QuantumLeap y persistirse en CrateDB para analitica historica.
+
+## 9. Acceso del Backend FastAPI (Issue #3)
+
+El backend implementado en `backend/` accede a todas las entidades del modelo NGSI-LD a traves de:
+
+- **OrionClient**: consulta estado actual de todas las entidades para GET /api/sensors, GET /api/impact
+- **QuantumLeapClient**: consulta historicos en CrateDB para GET /api/sensors/{id}/history
+- **MLModel (RandomForest)**: usa features de TrafficFlowObserved, AirQualityObserved, NoiseLevelObserved para generar TrafficEnvironmentImpactForecast
+- **OllamaExplainer**: construye prompts con atributos de todas las entidades para explicaciones en español
+
+Mapeo directo backend <-> modelo NGSI-LD:
+- TrafficFlowObserved → intensity, occupancy, averageSpeed (features ML)
+- AirQualityObserved → no2, pm25, o3 (targets ML y contexto LLM)
+- NoiseLevelObserved → LAeq, LAmax, LAS (features ML y alertas)
+- TrafficEnvironmentImpact → impactScore (target ML y alertas)
+- TrafficEnvironmentImpactForecast → predictedNO2, predictedPM25, predictedImpactScore (generada por backend)
+- Device → deviceState, location (contexto de sensor)
+- ItemFlowObserved → intensity, congested (complemento para alertas)
+- DeviceModel → metadata tecnica del sensor
+
+Con esta cobertura completa, el backend implementa el contrato de API REST requerido por el frontend, manteniendo full consistency NGSI-LD.
