@@ -50,6 +50,28 @@ class OrionClient:
         data = response.json()
         return data if isinstance(data, list) else [data]
 
+    def list_entities_v2(
+        self,
+        entity_type: Optional[str] = None,
+        entity_id: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> List[Dict[str, Any]]:
+        params: Dict[str, Any] = {"limit": limit, "offset": offset}
+        if entity_type:
+            params["type"] = entity_type
+        if entity_id:
+            params["id"] = entity_id
+        response = requests.get(
+            f"{self.base_url}/v2/entities",
+            timeout=self.timeout_seconds,
+            params=params,
+            headers={"Accept": "application/json"},
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data if isinstance(data, list) else [data]
+
     def get_entity(self, entity_id: str) -> Optional[Dict[str, Any]]:
         try:
             response = self._request("GET", f"/ngsi-ld/v1/entities/{entity_id}")

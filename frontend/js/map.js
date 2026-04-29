@@ -2,8 +2,8 @@
    MAP.JS - Leaflet map with heatmap
    =================================== */
 
-import { getSensors, getSensorHistory } from './api.js';
-import { on as wsOn } from './websocket.js';
+import { getSensors, getSensorHistory } from './api.js?v=20260429b';
+import { on as wsOn } from './websocket.js?v=20260429b';
 
 // Constants
 const CORUNA_CENTER = [43.3713, -8.4194];

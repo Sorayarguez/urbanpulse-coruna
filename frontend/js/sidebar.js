@@ -2,9 +2,9 @@
    SIDEBAR.JS - Sensor list and controls
    =================================== */
 
-import { getSensors, getAlerts } from './api.js';
-import { on as wsOn } from './websocket.js';
-import { selectSensor, setHeatmapMode, toggleHeatmap, toggleMarkers } from './map.js';
+import { getSensors, getAlerts } from './api.js?v=20260429b';
+import { on as wsOn } from './websocket.js?v=20260429b';
+import { selectSensor, setHeatmapMode, toggleHeatmap, toggleMarkers } from './map.js?v=20260429b';
 
 let selectedSensorId = null;
 
@@ -191,7 +191,7 @@ function setupSidebarEventListeners() {
     }
 
     // Mobile: Close sidebar when sensor is selected
-    document.addEventListener('sensor-selected', () => {
+    window.addEventListener('sensor-selected', () => {
         const sidebar = document.getElementById('sidebar');
         if (window.innerWidth < 768) {
             sidebar.classList.remove('open');

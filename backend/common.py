@@ -71,6 +71,8 @@ def unwrap_ngsi_value(value: Any) -> Any:
         return value.get("object")
     if isinstance(value, dict) and value.get("type") == "GeoProperty":
         return value.get("value")
+    if isinstance(value, dict) and value.get("type") in {"Number", "Text", "Boolean", "geo:json"}:
+        return value.get("value")
     return value
 
 

@@ -2,12 +2,13 @@
    MAIN.JS - Application entry point
    =================================== */
 
-import { initializeMap, selectSensor } from './map.js';
-import { initializeSidebar } from './sidebar.js';
-import { initializeCharts, updateChartsForSensor } from './charts.js';
-import { initializeViewer3D } from './viewer3d.js';
-import { initializeLLMPanel, loadExplanation } from './llm-panel.js';
-import { connect, startSimulation, on as wsOn } from './websocket.js';
+import { initializeMap, selectSensor } from './map.js?v=20260429b';
+import { initializeSidebar } from './sidebar.js?v=20260429b';
+import { initializeCharts, updateChartsForSensor } from './charts.js?v=20260429b';
+import { initializeViewer3D } from './viewer3d.js?v=20260429b';
+import { initializeLLMPanel, loadExplanation } from './llm-panel.js?v=20260429b';
+import { connect, startSimulation, on as wsOn } from './websocket.js?v=20260429b';
+import { getSensor } from './api.js?v=20260429b';
 
 /**
  * Main application initialization
@@ -61,10 +62,11 @@ async function initializeApp() {
  */
 function setupEventHandlers() {
     // Sensor selection
-    document.addEventListener('sensor-selected', (event) => {
+    window.addEventListener('sensor-selected', (event) => {
         const sensorId = event.detail?.sensorId;
         if (sensorId) {
             console.log('📌 Sensor selected:', sensorId);
+            updateMetricsPanel(sensorId);
             updateChartsForSensor(sensorId);
             loadExplanation(sensorId);
         }
@@ -73,9 +75,6 @@ function setupEventHandlers() {
     // Global callback for map popup
     window.selectSensorCallback = (sensorId) => {
         selectSensor(sensorId);
-        document.dispatchEvent(
-            new CustomEvent('sensor-selected', { detail: { sensorId } })
-        );
     };
 
     // WebSocket events
@@ -97,6 +96,36 @@ function setupEventHandlers() {
 
     // Mobile menu toggle
     setupMobileMenu();
+}
+
+/**
+ * Update the right-hand metrics panel with live sensor data.
+ */
+async function updateMetricsPanel(sensorId) {
+    try {
+        const overview = await getSensor(sensorId);
+        if (!overview) return;
+
+        const state = overview.state || {};
+        const traffic = state.traffic_intensity ?? state.TrafficFlowObserved?.intensity ?? 0;
+        const pm25 = state.pm25 ?? state.AirQualityObserved?.pm25 ?? 0;
+        const noise = state.noise_laeq ?? state.NoiseLevelObserved?.LAeq ?? 0;
+        const no2 = state.no2 ?? state.AirQualityObserved?.no2 ?? 0;
+
+        const selectedSensorName = document.getElementById('selected-sensor-name');
+        const metricNo2 = document.getElementById('metric-no2');
+        const metricPm25 = document.getElementById('metric-pm25');
+        const metricNoise = document.getElementById('metric-noise');
+        const metricTraffic = document.getElementById('metric-traffic');
+
+        if (selectedSensorName) selectedSensorName.textContent = overview.sensor?.name || sensorId;
+        if (metricNo2) metricNo2.textContent = Number(no2).toFixed(1);
+        if (metricPm25) metricPm25.textContent = Number(pm25).toFixed(1);
+        if (metricNoise) metricNoise.textContent = Number(noise).toFixed(1);
+        if (metricTraffic) metricTraffic.textContent = Number(traffic).toFixed(0);
+    } catch (error) {
+        console.error('Error updating metrics panel:', error);
+    }
 }
 
 /**

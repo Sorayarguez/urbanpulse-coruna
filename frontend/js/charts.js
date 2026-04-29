@@ -2,8 +2,8 @@
    CHARTS.JS - ChartJS implementation
    =================================== */
 
-import { getSensorHistory, getForecasts } from './api.js';
-import { on as wsOn } from './websocket.js';
+import { getSensorHistory, getForecasts } from './api.js?v=20260429b';
+import { on as wsOn } from './websocket.js?v=20260429b';
 
 let charts = {
     trafficVsNo2: null,
@@ -16,6 +16,12 @@ let charts = {
  */
 export async function initializeCharts() {
     try {
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js is not available; skipping chart initialization');
+            setupChartTabs();
+            return;
+        }
+
         // Create chart instances (empty initially)
         createTrafficVsNo2Chart();
         createEvolution24hChart();
