@@ -1,6 +1,8 @@
 /* ===================================
-   SENSORCARD.JS - Sensor card component
+   SENSORCARD.JS - Sensor card component with i18n
    =================================== */
+
+import i18n from '../i18n.js';
 
 export class SensorCard {
     constructor(sensor, state) {
@@ -26,27 +28,27 @@ export class SensorCard {
             <div class="card-header">
                 <div>
                     <div class="card-title">${this.sensor.name}</div>
-                    <div class="card-subtitle">${this.sensor.zone_factor ? 'Zona ' + this.sensor.zone_factor.toFixed(1) + 'x' : 'Sensor urbano'}</div>
+                    <div class="card-subtitle">${this.sensor.zone_factor ? 'Zone ' + this.sensor.zone_factor.toFixed(1) + 'x' : 'Urban sensor'}</div>
                 </div>
-                <span class="${statusClass}">${this.getSeverityLabel(severity)}</span>
+                <span class="${statusClass}">${i18n.t('severity.' + severity)}</span>
             </div>
 
             <div>
                 <div class="metric">
-                    <span class="metric-label">NO₂</span>
-                    <span class="metric-value">${no2.toFixed(1)}<span class="metric-unit">µg/m³</span></span>
+                    <span class="metric-label">${i18n.t('metric.no2')}</span>
+                    <span class="metric-value">${no2.toFixed(1)}<span class="metric-unit">${i18n.t('metric.unit.no2')}</span></span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">PM2.5</span>
-                    <span class="metric-value">${pm25.toFixed(1)}<span class="metric-unit">µg/m³</span></span>
+                    <span class="metric-label">${i18n.t('metric.pm25')}</span>
+                    <span class="metric-value">${pm25.toFixed(1)}<span class="metric-unit">${i18n.t('metric.unit.pm25')}</span></span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Tráfico</span>
-                    <span class="metric-value">${Math.round(traffic)}<span class="metric-unit">veh/h</span></span>
+                    <span class="metric-label">${i18n.t('metric.traffic')}</span>
+                    <span class="metric-value">${Math.round(traffic)}<span class="metric-unit">${i18n.t('metric.unit.traffic')}</span></span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Ruido</span>
-                    <span class="metric-value">${noise.toFixed(1)}<span class="metric-unit">dB</span></span>
+                    <span class="metric-label">${i18n.t('metric.noise')}</span>
+                    <span class="metric-value">${noise.toFixed(1)}<span class="metric-unit">${i18n.t('metric.unit.noise')}</span></span>
                 </div>
             </div>
         `;
@@ -65,16 +67,6 @@ export class SensorCard {
         if (no2 > 60) return 'warning';
         if (no2 > 40) return 'moderate';
         return 'good';
-    }
-
-    getSeverityLabel(severity) {
-        const labels = {
-            good: '✓ Bien',
-            moderate: '⚠ Moderado',
-            warning: '⚠ Malo',
-            critical: '✕ Crítico'
-        };
-        return labels[severity] || 'Desconocido';
     }
 
     update(state) {

@@ -1,5 +1,5 @@
 /* ===================================
-   APP-NEW.JS - Main application entry point (NEW VERSION)
+   APP-NEW.JS - Main application entry point with i18n
    =================================== */
 
 import Sidebar from './components/Sidebar.js';
@@ -7,6 +7,7 @@ import Header from './components/Header.js';
 import MapComponent from './components/MapComponent.js';
 import SensorCard from './components/SensorCard.js';
 import { getSensors, getAlerts } from './api.js';
+import i18n from './i18n.js';
 
 let currentPage = 'dashboard';
 let selectedSensorId = null;
@@ -46,6 +47,28 @@ export async function initializeApp() {
         console.error('❌ Initialization error:', error);
         displayError(error);
     }
+}
+
+/**
+ * Reload sensors UI when language changes
+ */
+function reloadSensors() {
+    const panel = document.getElementById('sensors-panel');
+    panel.innerHTML = '';
+
+    sensors.forEach(sensorState => {
+        const sensor = sensorState.sensor;
+        const state = sensorState.state;
+
+        // Create sensor card with new language
+        const card = new SensorCard(sensor, state);
+        const cardElement = card.render();
+        panel.appendChild(cardElement);
+
+        sensorCards[sensor.id] = card;
+    });
+
+    console.log('✓ Sensors UI updated with new language');
 }
 
 /**
@@ -102,6 +125,11 @@ function setupEventListeners() {
         filterSensorsByZone(query);
     });
 
+    // Language change - re-render sensor cards
+    window.addEventListener('language-changed', () => {
+        reloadSensors();
+    });
+
     // Global function for popup click handler
     window.selectSensor = selectSensor;
 }
@@ -118,22 +146,22 @@ function handlePageChange(page) {
             contentWrapper.style.display = 'grid';
             break;
         case 'traffic':
-            showPlaceholder(contentWrapper, '🚗 Vista de Tráfico', 'Análisis de flujos vehiculares en tiempo real');
+            showPlaceholder(contentWrapper, i18n.t('page.traffic'), i18n.t('page.traffic_desc'));
             break;
         case 'air':
-            showPlaceholder(contentWrapper, '💨 Calidad del Aire', 'Datos de calidad del aire por zona');
+            showPlaceholder(contentWrapper, i18n.t('page.air'), i18n.t('page.air_desc'));
             break;
         case 'noise':
-            showPlaceholder(contentWrapper, '🔊 Análisis de Ruido', 'Niveles de ruido ambiental');
+            showPlaceholder(contentWrapper, i18n.t('page.noise'), i18n.t('page.noise_desc'));
             break;
         case 'forecast':
-            showPlaceholder(contentWrapper, '🔮 Predicciones', 'Predicciones de 6, 12 y 24 horas');
+            showPlaceholder(contentWrapper, i18n.t('page.forecast'), i18n.t('page.forecast_desc'));
             break;
         case 'greenroute':
-            showPlaceholder(contentWrapper, '🚴 GreenRoute', 'Rutas saludables y ecológicas');
+            showPlaceholder(contentWrapper, i18n.t('page.greenroute'), i18n.t('page.greenroute_desc'));
             break;
         case 'ecozones':
-            showPlaceholder(contentWrapper, '🌱 EcoZones', 'Gestión de zonas de bajas emisiones');
+            showPlaceholder(contentWrapper, i18n.t('page.ecozones'), i18n.t('page.ecozones_desc'));
             break;
         default:
             contentWrapper.style.display = 'grid';
@@ -204,12 +232,10 @@ function displayError(error) {
     const app = document.getElementById('app');
     if (app) {
         app.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f5f1ed; font-family: sans-serif;">
-                <div style="text-align: center; max-width: 500px; padding: 40px;">
-                    <h1 style="color: #a66b6b; margin-bottom: 20px;">❌ Error de inicialización</h1>
-                    <p style="color: #555; margin-bottom: 20px;">${error.message}</p>
-                    <button onclick="location.reload()" class="btn btn-primary">Reintentar</button>
-                </div>
+            <div class="error-container">
+                <h1 class="error-title">${i18n.t('error.init')}</h1>
+                <p class="error-message">${error.message}</p>
+                <button onclick="location.reload()" class="btn btn-primary">${i18n.t('button.retry')}</button>
             </div>
         `;
     }

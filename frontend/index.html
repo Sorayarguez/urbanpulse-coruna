@@ -3,111 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="UrbanPulse Coruña - Dashboard de monitorización ambiental urbana profesional">
+    <meta name="theme-color" content="#f5f1ed">
+    <meta name="description" content="UrbanPulse Coruña - Professional urban environmental monitoring dashboard">
     <title>UrbanPulse Coruña - Dashboard Ambiental</title>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="./css/theme.css">
+    <!-- Professional Theme -->
+    <link rel="stylesheet" href="./css/theme-professional.css">
 </head>
 <body>
     <div id="app">
-        <!-- Header con búsqueda -->
+        <!-- Header con búsqueda y controles -->
         <header class="app-header">
             <div class="header-content">
-                <h1 class="logo">🌍 UrbanPulse</h1>
+                <h1 class="logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                        <circle cx="12" cy="12" r="8" fill="currentColor" opacity="0.2"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                    </svg>
+                    <span data-i18n="header.title">UrbanPulse</span>
+                </h1>
                 
                 <div class="search-container">
                     <input 
                         type="text" 
                         class="search-input" 
                         id="search-zones"
+                        data-i18n-placeholder="header.search"
                         placeholder="Buscar zonas (ej: Ronda de Outeiro, Cuatro Caminos)"
                     >
                 </div>
 
-                <div class="header-controls">
-                    <span class="status-indicator" id="connection-status" title="Estado de conexión"></span>
+                <div class="header-actions">
+                    <div class="connection-status" id="connection-status" data-i18n-title="status.connected" title="Conectado"></div>
+                    
+                    <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">🌙</button>
+                    
+                    <select class="lang-selector" id="lang-selector">
+                        <option value="es">ES</option>
+                        <option value="en">EN</option>
+                    </select>
                 </div>
             </div>
         </header>
 
-        <!-- Main Container -->
-        <div class="main-container">
-            <!-- Sidebar -->
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-section">
-                    <div class="sidebar-title">Navegación</div>
-                    <button class="nav-item active" data-page="dashboard">
-                        <span class="nav-icon">📊</span>
-                        <span>Dashboard</span>
-                    </button>
-                    <button class="nav-item" data-page="traffic">
-                        <span class="nav-icon">🚗</span>
-                        <span>Tráfico</span>
-                    </button>
-                    <button class="nav-item" data-page="air">
-                        <span class="nav-icon">💨</span>
-                        <span>Calidad del Aire</span>
-                    </button>
-                    <button class="nav-item" data-page="noise">
-                        <span class="nav-icon">🔊</span>
-                        <span>Ruido</span>
-                    </button>
-                    <button class="nav-item" data-page="forecast">
-                        <span class="nav-icon">🔮</span>
-                        <span>Predicciones</span>
-                    </button>
-                </div>
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar">
+            <!-- Main Navigation -->
+            <section class="sidebar-section">
+                <div class="sidebar-label" data-i18n="nav.sidebar">Navegación</div>
+                <button class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span data-i18n="nav.dashboard">Dashboard</span>
+                </button>
+                <button class="nav-item" data-page="traffic">
+                    <span class="nav-icon">🚗</span>
+                    <span data-i18n="nav.traffic">Tráfico</span>
+                </button>
+                <button class="nav-item" data-page="air">
+                    <span class="nav-icon">💨</span>
+                    <span data-i18n="nav.air">Calidad del Aire</span>
+                </button>
+                <button class="nav-item" data-page="noise">
+                    <span class="nav-icon">🔊</span>
+                    <span data-i18n="nav.noise">Ruido</span>
+                </button>
+                <button class="nav-item" data-page="forecast">
+                    <span class="nav-icon">🔮</span>
+                    <span data-i18n="nav.forecast">Predicciones</span>
+                </button>
+            </section>
 
-                <div class="sidebar-section">
-                    <div class="sidebar-title">Servicios</div>
-                    <button class="nav-item" data-page="greenroute">
-                        <span class="nav-icon">🚴</span>
-                        <span>GreenRoute</span>
-                    </button>
-                    <button class="nav-item" data-page="ecozones">
-                        <span class="nav-icon">🌱</span>
-                        <span>EcoZones</span>
-                    </button>
-                </div>
+            <!-- Services Section -->
+            <section class="sidebar-section">
+                <div class="sidebar-label" data-i18n="sidebar.services">Servicios</div>
+                <button class="nav-item" data-page="greenroute">
+                    <span class="nav-icon">🚴</span>
+                    <span data-i18n="nav.greenroute">GreenRoute</span>
+                </button>
+                <button class="nav-item" data-page="ecozones">
+                    <span class="nav-icon">🌱</span>
+                    <span data-i18n="nav.ecozones">EcoZones</span>
+                </button>
+            </section>
 
-                <div class="sidebar-section">
-                    <div class="sidebar-title">Panel IA</div>
-                    <div id="llm-panel-sidebar" style="padding: 12px; background: linear-gradient(135deg, rgba(74, 144, 164, 0.1) 0%, transparent 100%); border-radius: 8px; margin: 0 4px;">
-                        <p style="font-size: 13px; color: var(--text-light); margin-bottom: 8px;">💡 Explicaciones IA</p>
-                        <p id="llm-content-sidebar" style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                            Selecciona un sensor para obtener explicaciones personalizadas.
-                        </p>
+            <!-- AI Panel Section -->
+            <section class="sidebar-section">
+                <div class="sidebar-label" data-i18n="sidebar.ia">Panel IA</div>
+                <div class="llm-panel">
+                    <div class="llm-title" data-i18n="sidebar.ia_hint">💡 Explicaciones IA</div>
+                    <div class="llm-content" id="llm-content-sidebar" data-i18n="sidebar.ia_desc">
+                        Selecciona un sensor para obtener explicaciones personalizadas.
                     </div>
                 </div>
-            </aside>
+            </section>
+        </aside>
 
-            <!-- Content Area -->
-            <div class="content-area">
-                <div class="content-wrapper" id="content-wrapper">
-                    <!-- Map -->
-                    <div class="map-container" id="map"></div>
+        <!-- Main Content Area -->
+        <div id="content-wrapper">
+            <!-- Map container -->
+            <div id="map"></div>
 
-                    <!-- Right Panel - Sensores y Métricas -->
-                    <div class="right-panel" id="sensors-panel">
-                        <!-- Sensores cargados dinámicamente -->
-                    </div>
-                </div>
-            </div>
+            <!-- Sensors Panel -->
+            <div id="sensors-panel"></div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Third-party libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
 
-    <!-- Application scripts - Componentes modulares -->
+    <!-- Application initialization -->
     <script type="module">
+        // Import initialization functions
+        import i18n from './js/i18n.js';
+        import themeManager from './js/theme.js';
         import { initializeApp } from './js/app-new.js';
-        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Initialize theme and i18n
+        themeManager.initTheme();
+        i18n.updateUIText();
+
+        // Set up theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            themeManager.toggleTheme();
+            const icon = themeManager.getTheme() === 'dark' ? '☀️' : '🌙';
+            document.getElementById('theme-toggle').textContent = icon;
+            i18n.updateUIText();
+        });
+
+        // Set up language selector
+        document.getElementById('lang-selector').value = i18n.getLanguage();
+        document.getElementById('lang-selector').addEventListener('change', (e) => {
+            i18n.setLanguage(e.target.value);
+        });
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+
+        // Update theme icon on load
+        const icon = themeManager.getTheme() === 'dark' ? '☀️' : '🌙';
+        document.getElementById('theme-toggle').textContent = icon;
     </script>
 </body>
 </html>
