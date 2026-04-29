@@ -2,8 +2,8 @@
    LLM-PANEL.JS - LLM explanation panel
    =================================== */
 
-import { postExplain } from './api.js';
-import { on as wsOn } from './websocket.js';
+import { postExplain } from './api.js?v=20260429b';
+import { on as wsOn } from './websocket.js?v=20260429b';
 
 let llmCache = new Map();
 let selectedSensorId = null;
@@ -13,7 +13,7 @@ let selectedSensorId = null;
  */
 export function initializeLLMPanel() {
     // Listen for sensor selection
-    document.addEventListener('sensor-selected', (event) => {
+    window.addEventListener('sensor-selected', (event) => {
         const sensorId = event.detail?.sensorId;
         if (sensorId) {
             loadExplanation(sensorId);

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException, Query
@@ -36,6 +37,7 @@ else:
 orion_client = OrionClient(settings.orion_base_url, timeout_seconds=settings.request_timeout_seconds)
 quantumleap_client = QuantumLeapClient(settings.crate_http_url, timeout_seconds=settings.request_timeout_seconds)
 llm_explainer = OllamaExplainer(settings.ollama_base_url, settings.ollama_model, timeout_seconds=settings.request_timeout_seconds)
+logger = logging.getLogger(__name__)
 
 
 class ExplainRequest(BaseModel):
@@ -64,10 +66,14 @@ def _plain_entity(entity: Dict[str, Any]) -> Dict[str, Any]:
 def _current_sensor_state(sensor_id: str) -> Dict[str, Any]:
     current: Dict[str, Any] = {"sensor": sensor_by_id(sensor_id)}
     for entity_type in ["TrafficFlowObserved", "AirQualityObserved", "NoiseLevelObserved", "TrafficEnvironmentImpact", "TrafficEnvironmentImpactForecast", "Device"]:
+        entities = []
         try:
-            entities = orion_client.list_entities(entity_type=entity_type)
+            entities = orion_client.list_entities_v2(entity_type=entity_type)
         except Exception:
-            entities = []
+            try:
+                entities = orion_client.list_entities(entity_type=entity_type)
+            except Exception:
+                entities = []
         for entity in entities:
             if _entity_sensor_id(entity) == sensor_id:
                 current[entity_type] = _plain_entity(entity)
@@ -179,22 +185,52 @@ def explain(request: ExplainRequest) -> Dict[str, Any]:
         sensor = sensor_by_id(request.sensor_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="Sensor no encontrado") from exc
-    current = _current_sensor_state(request.sensor_id)
-    history_rows = quantumleap_client.fetch_rows(sensor_id=request.sensor_id, hours=request.include_history_hours)
-    history_summary = build_history_summary(history_rows)
-    forecasts = generate_forecasts_for_sensor(
-        request.sensor_id,
-        {
-            "traffic_intensity": float(current.get("traffic_intensity", 0.0)),
-            "traffic_occupancy": float(current.get("traffic_occupancy", 0.0)),
-            "traffic_avg_speed": float(current.get("traffic_avg_speed", 0.0)),
-            "noise_laeq": float(current.get("noise_laeq", 50.0)),
-        },
-        current_impact_id=(current.get("TrafficEnvironmentImpact") or {}).get("id") if isinstance(current.get("TrafficEnvironmentImpact"), dict) else None,
-        current_weather=current.get("weather"),
-        horizons=settings.forecast_horizons,
-    )
-    if request.force_forecast_refresh:
-        publish_forecasts(orion_client, forecasts)
-    explanation = llm_explainer.explain(sensor, current, history_summary, forecasts)
+
+    logger.info("/api/explain requested for sensor=%s hours=%s refresh=%s", request.sensor_id, request.include_history_hours, request.force_forecast_refresh)
+
+    try:
+        current = _current_sensor_state(request.sensor_id)
+    except Exception:
+        logger.exception("Failed to build current sensor state for sensor=%s", request.sensor_id)
+        current = {"sensor": sensor, "weather": default_weather_context(request.sensor_id)}
+
+    try:
+        history_rows = quantumleap_client.fetch_rows(sensor_id=request.sensor_id, hours=request.include_history_hours)
+        history_summary = build_history_summary(history_rows)
+    except Exception:
+        logger.exception("Failed to fetch history for sensor=%s", request.sensor_id)
+        history_rows = []
+        history_summary = {"no2": {"min": 0.0, "max": 0.0, "avg": 0.0, "last": 0.0, "delta": 0.0}, "traffic": {"min": 0.0, "max": 0.0, "avg": 0.0, "last": 0.0, "delta": 0.0}, "impact": {"min": 0.0, "max": 0.0, "avg": 0.0, "last": 0.0, "delta": 0.0}}
+
+    forecasts: List[Dict[str, Any]] = []
+    try:
+        forecasts = generate_forecasts_for_sensor(
+            request.sensor_id,
+            {
+                "traffic_intensity": float(current.get("traffic_intensity", 0.0)),
+                "traffic_occupancy": float(current.get("traffic_occupancy", 0.0)),
+                "traffic_avg_speed": float(current.get("traffic_avg_speed", 0.0)),
+                "noise_laeq": float(current.get("noise_laeq", 50.0)),
+            },
+            current_impact_id=(current.get("TrafficEnvironmentImpact") or {}).get("id") if isinstance(current.get("TrafficEnvironmentImpact"), dict) else None,
+            current_weather=current.get("weather"),
+            horizons=settings.forecast_horizons,
+        )
+        logger.info("Generated %s forecasts for sensor=%s", len(forecasts), request.sensor_id)
+    except Exception:
+        logger.exception("Forecast generation failed for sensor=%s", request.sensor_id)
+        forecasts = []
+
+    if request.force_forecast_refresh and forecasts:
+        try:
+            publish_forecasts(orion_client, forecasts)
+        except Exception:
+            logger.exception("Forecast publish failed for sensor=%s", request.sensor_id)
+
+    try:
+        explanation = llm_explainer.explain(sensor, current, history_summary, forecasts)
+    except Exception:
+        logger.exception("LLM explanation failed for sensor=%s; using fallback", request.sensor_id)
+        explanation = llm_explainer.build_local_explanation(sensor, current, history_summary, forecasts)
+
     return {"sensor": sensor, "history": history_summary, "forecasts": forecasts, "explanation": explanation}

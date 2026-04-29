@@ -2,7 +2,7 @@
    API.JS - API wrapper with caching
    =================================== */
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = '/api';
 const CACHE = new Map();
 const CACHE_TTL = {
     sensors: 5 * 60 * 1000,      // 5 minutes
