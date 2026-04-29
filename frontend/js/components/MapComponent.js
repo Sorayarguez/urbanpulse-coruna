@@ -6,6 +6,7 @@ export class MapComponent {
     constructor() {
         this.map = null;
         this.markers = {};
+        this.tileLayer = null;
         this.CORUNA_CENTER = [43.3713, -8.4194];
         this.MAP_ZOOM = 13;
     }
@@ -19,17 +20,38 @@ export class MapComponent {
 
         this.map = L.map(mapContainer).setView(this.CORUNA_CENTER, this.MAP_ZOOM);
 
-        // Usar tiles claros y profesionales
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© CartoDB © OpenStreetMap',
-            maxZoom: 19,
-            minZoom: 11,
-        }).addTo(this.map);
+        // Determinar tema actual y usar tiles correspondientes
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.updateTiles(isDarkMode);
 
         // Añadir control de capas
         L.control.layers({}, {}, { position: 'topright' }).addTo(this.map);
 
+        // Escuchar cambios de tema
+        window.addEventListener('theme-changed', (e) => {
+            const isDark = e.detail.theme === 'dark';
+            this.updateTiles(isDark);
+        });
+
         return this.map;
+    }
+
+    updateTiles(isDarkMode) {
+        // Remover tiles anteriores si existen
+        if (this.tileLayer) {
+            this.map.removeLayer(this.tileLayer);
+        }
+
+        // Usar tiles oscuros para modo dark, claros para modo light
+        const tileUrl = isDarkMode 
+            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+        this.tileLayer = L.tileLayer(tileUrl, {
+            attribution: '© CartoDB © OpenStreetMap',
+            maxZoom: 19,
+            minZoom: 11,
+        }).addTo(this.map);
     }
 
     addSensor(sensor, state) {

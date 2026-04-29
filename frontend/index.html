@@ -11,23 +11,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     
     <!-- Professional Theme -->
-    <link rel="stylesheet" href="./css/theme-professional.css">
+    <link rel="stylesheet" href="./css/theme-new.css">
 </head>
 <body>
     <div id="app">
-        <!-- Header con búsqueda y controles -->
+        <!-- Header -->
         <header class="app-header">
             <div class="header-content">
                 <h1 class="logo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
-                        <circle cx="12" cy="12" r="8" fill="currentColor" opacity="0.2"></circle>
-                        <path d="M12 6v6l4 2"></path>
+                    <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Green leaf -->
+                        <path d="M50 10 Q70 30 70 50 Q70 75 50 90 Q30 75 30 50 Q30 30 50 10" fill="currentColor" opacity="0.8"/>
+                        <!-- Happy biker (simplified) -->
+                        <circle cx="55" cy="45" r="6" fill="currentColor"/>
+                        <path d="M55 52 L55 65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M55 55 L45 65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M55 55 L65 65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                     <span data-i18n="header.title">UrbanPulse</span>
                 </h1>
                 
                 <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
                     <input 
                         type="text" 
                         class="search-input" 
@@ -40,9 +48,9 @@
                 <div class="header-actions">
                     <div class="connection-status" id="connection-status" data-i18n-title="status.connected" title="Conectado"></div>
                     
-                    <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">🌙</button>
+                    <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" data-i18n-title="actions.toggleTheme">🌙</button>
                     
-                    <select class="lang-selector" id="lang-selector">
+                    <select class="lang-selector" id="lang-selector" data-i18n-attr="lang">
                         <option value="es">ES</option>
                         <option value="en">EN</option>
                     </select>
@@ -50,65 +58,88 @@
             </div>
         </header>
 
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar">
-            <!-- Main Navigation -->
-            <section class="sidebar-section">
-                <div class="sidebar-label" data-i18n="nav.sidebar">Navegación</div>
-                <button class="nav-item active" data-page="dashboard">
-                    <span class="nav-icon">📊</span>
-                    <span data-i18n="nav.dashboard">Dashboard</span>
-                </button>
-                <button class="nav-item" data-page="traffic">
-                    <span class="nav-icon">🚗</span>
-                    <span data-i18n="nav.traffic">Tráfico</span>
-                </button>
-                <button class="nav-item" data-page="air">
-                    <span class="nav-icon">💨</span>
-                    <span data-i18n="nav.air">Calidad del Aire</span>
-                </button>
-                <button class="nav-item" data-page="noise">
-                    <span class="nav-icon">🔊</span>
-                    <span data-i18n="nav.noise">Ruido</span>
-                </button>
-                <button class="nav-item" data-page="forecast">
-                    <span class="nav-icon">🔮</span>
-                    <span data-i18n="nav.forecast">Predicciones</span>
-                </button>
-            </section>
-
-            <!-- Services Section -->
-            <section class="sidebar-section">
-                <div class="sidebar-label" data-i18n="sidebar.services">Servicios</div>
-                <button class="nav-item" data-page="greenroute">
-                    <span class="nav-icon">🚴</span>
-                    <span data-i18n="nav.greenroute">GreenRoute</span>
-                </button>
-                <button class="nav-item" data-page="ecozones">
-                    <span class="nav-icon">🌱</span>
-                    <span data-i18n="nav.ecozones">EcoZones</span>
-                </button>
-            </section>
-
-            <!-- AI Panel Section -->
-            <section class="sidebar-section">
-                <div class="sidebar-label" data-i18n="sidebar.ia">Panel IA</div>
-                <div class="llm-panel">
-                    <div class="llm-title" data-i18n="sidebar.ia_hint">💡 Explicaciones IA</div>
-                    <div class="llm-content" id="llm-content-sidebar" data-i18n="sidebar.ia_desc">
-                        Selecciona un sensor para obtener explicaciones personalizadas.
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="app-sidebar" id="sidebar">
+                <nav class="sidebar-nav">
+                    <!-- Navigation Section -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title" data-i18n="nav.navigation">Navegación</h2>
+                        <div class="nav-items">
+                            <button class="nav-item active" data-page="dashboard" data-i18n="nav.dashboard">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                                </svg>
+                                <span>Dashboard</span>
+                            </button>
+                            <button class="nav-item" data-page="traffic" data-i18n="nav.traffic">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18 12a2 2 0 100-4 2 2 0 000 4z"/><path d="M6 12a2 2 0 100-4 2 2 0 000 4z"/><path d="M12 18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/><path d="M20 3H4c-1.1 0-2 .9-2 2v11h18V5c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                                <span data-i18n="nav.traffic">Tráfico</span>
+                            </button>
+                            <button class="nav-item" data-page="air" data-i18n="nav.air">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                                </svg>
+                                <span data-i18n="nav.air">Calidad del Aire</span>
+                            </button>
+                            <button class="nav-item" data-page="noise" data-i18n="nav.noise">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 9v6h10V9H7zm13-4h-1V3h-2v2H8V3H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H5V10h14v11z"/>
+                                </svg>
+                                <span data-i18n="nav.noise">Ruido</span>
+                            </button>
+                            <button class="nav-item" data-page="forecasts" data-i18n="nav.forecasts">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/>
+                                </svg>
+                                <span data-i18n="nav.forecasts">Predicciones</span>
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Services Section -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title" data-i18n="nav.services">Servicios</h2>
+                        <div class="nav-items">
+                            <button class="nav-item" data-page="greenroute" data-i18n="nav.greenroute">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                <span data-i18n="nav.greenroute">GreenRoute</span>
+                            </button>
+                            <button class="nav-item" data-page="ecozones" data-i18n="nav.ecozones">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+                                </svg>
+                                <span data-i18n="nav.ecozones">EcoZones</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Panel Section -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title" data-i18n="nav.ai">Explicaciones IA</h2>
+                        <div class="llm-panel" id="llm-panel-sidebar">
+                            <p data-i18n="nav.aiDescription">Selecciona un sensor para obtener explicaciones personalizadas.</p>
+                            <div id="llm-content-sidebar" class="llm-content"></div>
+                        </div>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Map Container -->
+                <div class="map-container">
+                    <div id="map" class="map"></div>
                 </div>
-            </section>
-        </aside>
 
-        <!-- Main Content Area -->
-        <div id="content-wrapper">
-            <!-- Map container -->
-            <div id="map"></div>
-
-            <!-- Sensors Panel -->
-            <div id="sensors-panel"></div>
+                <!-- Sensors Panel -->
+                <div class="sensors-panel" id="sensors-panel"></div>
+            </main>
         </div>
     </div>
 

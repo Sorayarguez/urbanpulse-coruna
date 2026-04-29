@@ -8,23 +8,23 @@ const translations = {
         'header.title': 'UrbanPulse',
         'header.search': 'Buscar zonas (ej: Ronda de Outeiro, Cuatro Caminos)',
         
-        // Navigation label
-        'nav.sidebar': 'Navegación',
+        // Navigation sections
+        'nav.navigation': 'Navegación',
+        'nav.services': 'Servicios',
+        'nav.ai': 'Explicaciones IA',
+        'nav.aiDescription': 'Selecciona un sensor para obtener explicaciones personalizadas.',
         
-        // Sidebar - Navigation
+        // Navigation items
         'nav.dashboard': 'Dashboard',
         'nav.traffic': 'Tráfico',
         'nav.air': 'Calidad del Aire',
         'nav.noise': 'Ruido',
-        'nav.forecast': 'Predicciones',
+        'nav.forecasts': 'Predicciones',
         'nav.greenroute': 'GreenRoute',
         'nav.ecozones': 'EcoZones',
         
-        // Sidebar - Services
-        'sidebar.services': 'Servicios',
-        'sidebar.ia': 'Panel IA',
-        'sidebar.ia_hint': 'Explicaciones IA',
-        'sidebar.ia_desc': 'Selecciona un sensor para obtener explicaciones personalizadas.',
+        // Actions
+        'actions.toggleTheme': 'Cambiar tema',
         
         // Metrics
         'metric.no2': 'NO₂',
@@ -77,23 +77,23 @@ const translations = {
         'header.title': 'UrbanPulse',
         'header.search': 'Search zones (e.g: Ronda de Outeiro, Cuatro Caminos)',
         
-        // Navigation label
-        'nav.sidebar': 'Navigation',
+        // Navigation sections
+        'nav.navigation': 'Navigation',
+        'nav.services': 'Services',
+        'nav.ai': 'AI Explanations',
+        'nav.aiDescription': 'Select a sensor to get personalized explanations.',
         
-        // Sidebar - Navigation
+        // Navigation items
         'nav.dashboard': 'Dashboard',
         'nav.traffic': 'Traffic',
         'nav.air': 'Air Quality',
         'nav.noise': 'Noise',
-        'nav.forecast': 'Forecasts',
+        'nav.forecasts': 'Forecasts',
         'nav.greenroute': 'GreenRoute',
         'nav.ecozones': 'EcoZones',
         
-        // Sidebar - Services
-        'sidebar.services': 'Services',
-        'sidebar.ia': 'AI Panel',
-        'sidebar.ia_hint': 'AI Explanations',
-        'sidebar.ia_desc': 'Select a sensor to get personalized explanations.',
+        // Actions
+        'actions.toggleTheme': 'Toggle theme',
         
         // Metrics
         'metric.no2': 'NO₂',
