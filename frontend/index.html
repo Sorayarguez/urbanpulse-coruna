@@ -3,178 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="UrbanPulse Coruña - Dashboard de monitorización ambiental urbana">
+    <meta name="theme-color" content="#f5f1ed">
+    <meta name="description" content="UrbanPulse Coruña - Professional urban environmental monitoring dashboard">
     <title>UrbanPulse Coruña - Dashboard Ambiental</title>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     
-    <!-- Local styles -->
-    <link rel="stylesheet" href="./css/theme.css">
-    <link rel="stylesheet" href="./css/layout.css">
-
-    <style>
-        /* Inline critical styles for immediate rendering */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            height: 100%;
-            width: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-    </style>
+    <!-- Professional Theme -->
+    <link rel="stylesheet" href="./css/theme-new.css">
 </head>
 <body>
     <div id="app">
-        <!-- Header/Navigation -->
+        <!-- Header -->
         <header class="app-header">
             <div class="header-content">
-                <h1 class="logo">UrbanPulse Coruña</h1>
-                <div class="header-controls">
-                    <button id="menu-toggle" class="btn-icon" title="Menú">☰</button>
-                    <span class="status-indicator" id="connection-status"></span>
+                <h1 class="logo">
+                    <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Green leaf -->
+                        <path d="M50 10 Q70 30 70 50 Q70 75 50 90 Q30 75 30 50 Q30 30 50 10" fill="currentColor" opacity="0.8"/>
+                        <!-- Happy biker (simplified) -->
+                        <circle cx="55" cy="45" r="6" fill="currentColor"/>
+                        <path d="M55 52 L55 65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M55 55 L45 65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M55 55 L65 65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span data-i18n="header.title">UrbanPulse</span>
+                </h1>
+                
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="search-zones"
+                        data-i18n-placeholder="header.search"
+                        placeholder="Buscar zonas (ej: Ronda de Outeiro, Cuatro Caminos)"
+                    >
+                </div>
+
+                <div class="header-actions">
+                    <div class="connection-status" id="connection-status" data-i18n-title="status.connected" title="Conectado"></div>
+                    
+                    <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" data-i18n-title="actions.toggleTheme">🌙</button>
+                    
+                    <select class="lang-selector" id="lang-selector" data-i18n-attr="lang">
+                        <option value="es">ES</option>
+                        <option value="en">EN</option>
+                    </select>
                 </div>
             </div>
         </header>
 
-        <!-- Main container with 3-column layout -->
-        <div class="layout-container">
-            <!-- SIDEBAR: Sensor list, toggles, alerts, LLM panel -->
-            <aside id="sidebar" class="sidebar">
-                <!-- Layer controls -->
-                <section class="panel-section">
-                    <h2>Capas</h2>
-                    <div class="controls-group">
-                        <label class="checkbox-control">
-                            <input type="checkbox" id="toggle-heatmap" checked>
-                            <span class="label-text">Capa de calor NO₂</span>
-                        </label>
-                        <label class="checkbox-control">
-                            <input type="checkbox" id="toggle-markers" checked>
-                            <span class="label-text">Marcadores sensores</span>
-                        </label>
-                        <fieldset class="heatmap-mode">
-                            <legend>Modo mapa de calor</legend>
-                            <label class="radio-control">
-                                <input type="radio" name="heatmap-mode" value="realtime" checked>
-                                <span class="label-text">Tiempo real</span>
-                            </label>
-                            <label class="radio-control">
-                                <input type="radio" name="heatmap-mode" value="historical">
-                                <span class="label-text">Histórico 24h</span>
-                            </label>
-                        </fieldset>
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="app-sidebar" id="sidebar">
+                <nav class="sidebar-nav">
+                    <!-- Navigation Section -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title" data-i18n="nav.navigation">Navegación</h2>
+                        <div class="nav-items">
+                            <button class="nav-item active" data-page="dashboard" data-i18n="nav.dashboard">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                                </svg>
+                                <span>Dashboard</span>
+                            </button>
+                            <button class="nav-item" data-page="traffic" data-i18n="nav.traffic">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18 12a2 2 0 100-4 2 2 0 000 4z"/><path d="M6 12a2 2 0 100-4 2 2 0 000 4z"/><path d="M12 18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/><path d="M20 3H4c-1.1 0-2 .9-2 2v11h18V5c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                                <span data-i18n="nav.traffic">Tráfico</span>
+                            </button>
+                            <button class="nav-item" data-page="air" data-i18n="nav.air">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                                </svg>
+                                <span data-i18n="nav.air">Calidad del Aire</span>
+                            </button>
+                            <button class="nav-item" data-page="noise" data-i18n="nav.noise">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 9v6h10V9H7zm13-4h-1V3h-2v2H8V3H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H5V10h14v11z"/>
+                                </svg>
+                                <span data-i18n="nav.noise">Ruido</span>
+                            </button>
+                            <button class="nav-item" data-page="forecasts" data-i18n="nav.forecasts">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/>
+                                </svg>
+                                <span data-i18n="nav.forecasts">Predicciones</span>
+                            </button>
+                        </div>
                     </div>
-                </section>
 
-                <!-- Sensor list -->
-                <section class="panel-section">
-                    <h2>Sensores</h2>
-                    <ul id="sensor-list" class="sensor-list">
-                        <!-- Populated by JavaScript -->
-                    </ul>
-                </section>
-
-                <!-- Alerts -->
-                <section class="panel-section">
-                    <h2>Alertas</h2>
-                    <div id="alerts-container" class="alerts-container">
-                        <!-- Populated by JavaScript -->
+                    <!-- Services Section -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title" data-i18n="nav.services">Servicios</h2>
+                        <div class="nav-items">
+                            <button class="nav-item" data-page="greenroute" data-i18n="nav.greenroute">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                <span data-i18n="nav.greenroute">GreenRoute</span>
+                            </button>
+                            <button class="nav-item" data-page="ecozones" data-i18n="nav.ecozones">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+                                </svg>
+                                <span data-i18n="nav.ecozones">EcoZones</span>
+                            </button>
+                        </div>
                     </div>
-                </section>
 
-                <!-- LLM Explainer Panel -->
-                <section class="panel-section llm-panel">
-                    <h2>Explicación IA</h2>
-                    <div id="llm-content" class="llm-content">
-                        <p class="placeholder">Selecciona un sensor para obtener una explicación IA</p>
+                    <!-- AI Panel Section -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title" data-i18n="nav.ai">Explicaciones IA</h2>
+                        <div class="llm-panel" id="llm-panel-sidebar">
+                            <p data-i18n="nav.aiDescription">Selecciona un sensor para obtener explicaciones personalizadas.</p>
+                            <div id="llm-content-sidebar" class="llm-content"></div>
+                        </div>
                     </div>
-                </section>
+                </nav>
             </aside>
 
-            <!-- CENTER: Leaflet Map -->
-            <main id="map-container" class="map-container">
-                <div id="map"></div>
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Map Container -->
+                <div class="map-container">
+                    <div id="map" class="map"></div>
+                </div>
+
+                <!-- Sensors Panel -->
+                <div class="sensors-panel" id="sensors-panel"></div>
             </main>
-
-            <!-- RIGHT PANEL: Metrics and Charts -->
-            <section id="metrics-panel" class="metrics-panel">
-                <!-- Current metrics -->
-                <div class="metrics-header">
-                    <h2 id="selected-sensor-name">Selecciona un sensor</h2>
-                    <div class="current-metrics">
-                        <div class="metric-card">
-                            <label>NO₂</label>
-                            <span id="metric-no2" class="value">—</span>
-                            <span class="unit">µg/m³</span>
-                        </div>
-                        <div class="metric-card">
-                            <label>PM2.5</label>
-                            <span id="metric-pm25" class="value">—</span>
-                            <span class="unit">µg/m³</span>
-                        </div>
-                        <div class="metric-card">
-                            <label>Ruido</label>
-                            <span id="metric-noise" class="value">—</span>
-                            <span class="unit">dB</span>
-                        </div>
-                        <div class="metric-card">
-                            <label>Tráfico</label>
-                            <span id="metric-traffic" class="value">—</span>
-                            <span class="unit">veh/h</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts section with tabs -->
-                <div class="charts-tabs">
-                    <div class="tab-buttons">
-                        <button class="tab-btn active" data-tab="chart-dual">Tráfico vs NO₂</button>
-                        <button class="tab-btn" data-tab="chart-evolution">Evolución 24h</button>
-                        <button class="tab-btn" data-tab="chart-radar">Índices</button>
-                        <button class="tab-btn" data-tab="viewer-3d">Visor 3D</button>
-                    </div>
-
-                    <!-- Dual-axis chart: Traffic vs NO2 -->
-                    <div id="chart-dual" class="tab-content active">
-                        <canvas id="chart-traffic-no2"></canvas>
-                    </div>
-
-                    <!-- Evolution chart: 24h trend -->
-                    <div id="chart-evolution" class="tab-content">
-                        <canvas id="chart-evolution-24h"></canvas>
-                    </div>
-
-                    <!-- Radar chart: Environmental indices -->
-                    <div id="chart-radar" class="tab-content">
-                        <canvas id="chart-indices-radar"></canvas>
-                    </div>
-
-                    <!-- ThreeJS 3D viewer -->
-                    <div id="viewer-3d" class="tab-content">
-                        <div id="canvas-3d" class="canvas-3d"></div>
-                        <div class="viewer-controls">
-                            <button id="btn-time-lapse" class="btn-small">▶ Time-lapse</button>
-                            <input type="range" id="timeline-slider" class="timeline" min="0" max="24" value="0">
-                            <span id="timeline-label" class="timeline-label">00:00</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Third-party libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r164/three.min.js"></script>
-    <script src="https://cdn.socket.io/4.7.0/socket.io.min.js"></script>
 
-    <!-- Application scripts -->
-    <script type="module" src="./js/main.js"></script>
+    <!-- Application initialization -->
+    <script type="module">
+        // Import initialization functions
+        import i18n from './js/i18n.js';
+        import themeManager from './js/theme.js';
+        import { initializeApp } from './js/app-new.js';
+
+        // Initialize theme and i18n
+        themeManager.initTheme();
+        i18n.updateUIText();
+
+        // Set up theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            themeManager.toggleTheme();
+            const icon = themeManager.getTheme() === 'dark' ? '☀️' : '🌙';
+            document.getElementById('theme-toggle').textContent = icon;
+            i18n.updateUIText();
+        });
+
+        // Set up language selector
+        document.getElementById('lang-selector').value = i18n.getLanguage();
+        document.getElementById('lang-selector').addEventListener('change', (e) => {
+            i18n.setLanguage(e.target.value);
+        });
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+
+        // Update theme icon on load
+        const icon = themeManager.getTheme() === 'dark' ? '☀️' : '🌙';
+        document.getElementById('theme-toggle').textContent = icon;
+    </script>
 </body>
 </html>
