@@ -77,6 +77,9 @@ const translations = {
         'header.title': 'UrbanPulse',
         'header.search': 'Search zones (e.g: Ronda de Outeiro, Cuatro Caminos)',
         
+        // Navigation label
+        'nav.sidebar': 'Navigation',
+        
         // Sidebar - Navigation
         'nav.dashboard': 'Dashboard',
         'nav.traffic': 'Traffic',
