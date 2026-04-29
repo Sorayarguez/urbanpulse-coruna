@@ -5,6 +5,12 @@ Unified entrypoint for UrbanPulse Coruña.
 Run `python3 app.py` to start a server at http://localhost:8000.
 This module reuses the FastAPI app already defined in `backend/main.py`,
 keeps existing API routes untouched, and serves the web frontend from `frontend/`.
+
+The frontend now includes:
+- Modular component architecture (Sidebar, Header, Map, SensorCard)
+- Professional UI with light palette (beige, soft blues, soft accents)
+- Search functionality for zones
+- Navigation sidebar with main pages: Dashboard, Traffic, Air Quality, Noise, Forecasts, GreenRoute, EcoZones
 """
 from __future__ import annotations
 

@@ -3,178 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="UrbanPulse Coruña - Dashboard de monitorización ambiental urbana">
+    <meta name="description" content="UrbanPulse Coruña - Dashboard de monitorización ambiental urbana profesional">
     <title>UrbanPulse Coruña - Dashboard Ambiental</title>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     
-    <!-- Local styles -->
-    <link rel="stylesheet" href="./css/theme.css">
-    <link rel="stylesheet" href="./css/layout.css">
-
-    <style>
-        /* Inline critical styles for immediate rendering */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            height: 100%;
-            width: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-    </style>
+    <!-- Styles -->
+    <link rel="stylesheet" href="./css/theme-new.css">
 </head>
 <body>
     <div id="app">
-        <!-- Header/Navigation -->
+        <!-- Header con búsqueda -->
         <header class="app-header">
             <div class="header-content">
-                <h1 class="logo">UrbanPulse Coruña</h1>
+                <h1 class="logo">🌍 UrbanPulse</h1>
+                
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="search-zones"
+                        placeholder="Buscar zonas (ej: Ronda de Outeiro, Cuatro Caminos)"
+                    >
+                </div>
+
                 <div class="header-controls">
-                    <button id="menu-toggle" class="btn-icon" title="Menú">☰</button>
-                    <span class="status-indicator" id="connection-status"></span>
+                    <span class="status-indicator" id="connection-status" title="Estado de conexión"></span>
                 </div>
             </div>
         </header>
 
-        <!-- Main container with 3-column layout -->
-        <div class="layout-container">
-            <!-- SIDEBAR: Sensor list, toggles, alerts, LLM panel -->
-            <aside id="sidebar" class="sidebar">
-                <!-- Layer controls -->
-                <section class="panel-section">
-                    <h2>Capas</h2>
-                    <div class="controls-group">
-                        <label class="checkbox-control">
-                            <input type="checkbox" id="toggle-heatmap" checked>
-                            <span class="label-text">Capa de calor NO₂</span>
-                        </label>
-                        <label class="checkbox-control">
-                            <input type="checkbox" id="toggle-markers" checked>
-                            <span class="label-text">Marcadores sensores</span>
-                        </label>
-                        <fieldset class="heatmap-mode">
-                            <legend>Modo mapa de calor</legend>
-                            <label class="radio-control">
-                                <input type="radio" name="heatmap-mode" value="realtime" checked>
-                                <span class="label-text">Tiempo real</span>
-                            </label>
-                            <label class="radio-control">
-                                <input type="radio" name="heatmap-mode" value="historical">
-                                <span class="label-text">Histórico 24h</span>
-                            </label>
-                        </fieldset>
-                    </div>
-                </section>
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Navegación</div>
+                    <button class="nav-item active" data-page="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-item" data-page="traffic">
+                        <span class="nav-icon">🚗</span>
+                        <span>Tráfico</span>
+                    </button>
+                    <button class="nav-item" data-page="air">
+                        <span class="nav-icon">💨</span>
+                        <span>Calidad del Aire</span>
+                    </button>
+                    <button class="nav-item" data-page="noise">
+                        <span class="nav-icon">🔊</span>
+                        <span>Ruido</span>
+                    </button>
+                    <button class="nav-item" data-page="forecast">
+                        <span class="nav-icon">🔮</span>
+                        <span>Predicciones</span>
+                    </button>
+                </div>
 
-                <!-- Sensor list -->
-                <section class="panel-section">
-                    <h2>Sensores</h2>
-                    <ul id="sensor-list" class="sensor-list">
-                        <!-- Populated by JavaScript -->
-                    </ul>
-                </section>
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Servicios</div>
+                    <button class="nav-item" data-page="greenroute">
+                        <span class="nav-icon">🚴</span>
+                        <span>GreenRoute</span>
+                    </button>
+                    <button class="nav-item" data-page="ecozones">
+                        <span class="nav-icon">🌱</span>
+                        <span>EcoZones</span>
+                    </button>
+                </div>
 
-                <!-- Alerts -->
-                <section class="panel-section">
-                    <h2>Alertas</h2>
-                    <div id="alerts-container" class="alerts-container">
-                        <!-- Populated by JavaScript -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Panel IA</div>
+                    <div id="llm-panel-sidebar" style="padding: 12px; background: linear-gradient(135deg, rgba(74, 144, 164, 0.1) 0%, transparent 100%); border-radius: 8px; margin: 0 4px;">
+                        <p style="font-size: 13px; color: var(--text-light); margin-bottom: 8px;">💡 Explicaciones IA</p>
+                        <p id="llm-content-sidebar" style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                            Selecciona un sensor para obtener explicaciones personalizadas.
+                        </p>
                     </div>
-                </section>
-
-                <!-- LLM Explainer Panel -->
-                <section class="panel-section llm-panel">
-                    <h2>Explicación IA</h2>
-                    <div id="llm-content" class="llm-content">
-                        <p class="placeholder">Selecciona un sensor para obtener una explicación IA</p>
-                    </div>
-                </section>
+                </div>
             </aside>
 
-            <!-- CENTER: Leaflet Map -->
-            <main id="map-container" class="map-container">
-                <div id="map"></div>
-            </main>
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="content-wrapper" id="content-wrapper">
+                    <!-- Map -->
+                    <div class="map-container" id="map"></div>
 
-            <!-- RIGHT PANEL: Metrics and Charts -->
-            <section id="metrics-panel" class="metrics-panel">
-                <!-- Current metrics -->
-                <div class="metrics-header">
-                    <h2 id="selected-sensor-name">Selecciona un sensor</h2>
-                    <div class="current-metrics">
-                        <div class="metric-card">
-                            <label>NO₂</label>
-                            <span id="metric-no2" class="value">—</span>
-                            <span class="unit">µg/m³</span>
-                        </div>
-                        <div class="metric-card">
-                            <label>PM2.5</label>
-                            <span id="metric-pm25" class="value">—</span>
-                            <span class="unit">µg/m³</span>
-                        </div>
-                        <div class="metric-card">
-                            <label>Ruido</label>
-                            <span id="metric-noise" class="value">—</span>
-                            <span class="unit">dB</span>
-                        </div>
-                        <div class="metric-card">
-                            <label>Tráfico</label>
-                            <span id="metric-traffic" class="value">—</span>
-                            <span class="unit">veh/h</span>
-                        </div>
+                    <!-- Right Panel - Sensores y Métricas -->
+                    <div class="right-panel" id="sensors-panel">
+                        <!-- Sensores cargados dinámicamente -->
                     </div>
                 </div>
-
-                <!-- Charts section with tabs -->
-                <div class="charts-tabs">
-                    <div class="tab-buttons">
-                        <button class="tab-btn active" data-tab="chart-dual">Tráfico vs NO₂</button>
-                        <button class="tab-btn" data-tab="chart-evolution">Evolución 24h</button>
-                        <button class="tab-btn" data-tab="chart-radar">Índices</button>
-                        <button class="tab-btn" data-tab="viewer-3d">Visor 3D</button>
-                    </div>
-
-                    <!-- Dual-axis chart: Traffic vs NO2 -->
-                    <div id="chart-dual" class="tab-content active">
-                        <canvas id="chart-traffic-no2"></canvas>
-                    </div>
-
-                    <!-- Evolution chart: 24h trend -->
-                    <div id="chart-evolution" class="tab-content">
-                        <canvas id="chart-evolution-24h"></canvas>
-                    </div>
-
-                    <!-- Radar chart: Environmental indices -->
-                    <div id="chart-radar" class="tab-content">
-                        <canvas id="chart-indices-radar"></canvas>
-                    </div>
-
-                    <!-- ThreeJS 3D viewer -->
-                    <div id="viewer-3d" class="tab-content">
-                        <div id="canvas-3d" class="canvas-3d"></div>
-                        <div class="viewer-controls">
-                            <button id="btn-time-lapse" class="btn-small">▶ Time-lapse</button>
-                            <input type="range" id="timeline-slider" class="timeline" min="0" max="24" value="0">
-                            <span id="timeline-label" class="timeline-label">00:00</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </div>
         </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r164/three.min.js"></script>
-    <script src="https://cdn.socket.io/4.7.0/socket.io.min.js"></script>
 
-    <!-- Application scripts -->
-    <script type="module" src="./js/main.js"></script>
+    <!-- Application scripts - Componentes modulares -->
+    <script type="module">
+        import { initializeApp } from './js/app-new.js';
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
 </body>
 </html>
