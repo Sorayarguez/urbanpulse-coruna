@@ -1,0 +1,33 @@
+{
+  "uid": "alertas_anomalias",
+  "title": "Alertas y anomalías",
+  "schemaVersion": 30,
+  "version": 1,
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "table",
+      "title": "Eventos críticos",
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 8},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT ts AS time, payload->>'zone' AS zone, payload->>'sensor_id' AS sensor, payload->>'alert_type' AS alert_type, payload->>'value' AS value FROM urbanpulse_history WHERE (payload->>'alert')::text = 'true' AND ts BETWEEN $__timeFrom() AND $__timeTo() ORDER BY ts DESC LIMIT 500",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "type": "heatmap",
+      "title": "Frecuencia de alertas por zona",
+      "gridPos": {"x": 0, "y": 8, "w": 24, "h": 8},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT payload->>'zone' AS zone, count(*) AS cnt FROM urbanpulse_history WHERE (payload->>'alert')::text = 'true' AND ts BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY cnt DESC",
+          "format": "table"
+        }
+      ]
+    }
+  ]
+}

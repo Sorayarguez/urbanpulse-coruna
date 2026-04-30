@@ -1,0 +1,34 @@
+{
+  "uid": "vison_general",
+  "title": "Visión general ambiental",
+  "schemaVersion": 30,
+  "version": 1,
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "NO2",
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 9},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT ts AS time, payload->>'no2' AS no2 FROM urbanpulse_history WHERE ts BETWEEN $__timeFrom() AND $__timeTo() ORDER BY ts",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "PM2.5",
+      "gridPos": {"x": 0, "y": 9, "w": 24, "h": 9},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT ts AS time, payload->>'pm25' AS pm25 FROM urbanpulse_history WHERE ts BETWEEN $__timeFrom() AND $__timeTo() ORDER BY ts",
+          "format": "time_series"
+        }
+      ]
+    }
+  ],
+  "templating": {"list": [{"name": "zone", "type": "query", "query": "SELECT DISTINCT payload->>'zone' FROM urbanpulse_history ORDER BY 1"}]}
+}
