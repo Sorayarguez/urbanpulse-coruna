@@ -1,0 +1,55 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "prediccion-ml",
+    "title": "Predicción ML",
+    "panels": [],
+    "templating": { "list": [] }
+  },
+  "overwrite": true
+}
+{
+  "uid": "prediccion_ml",
+  "title": "Predicción ML: reales vs predichos",
+  "schemaVersion": 30,
+  "version": 1,
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "NO2: real vs predicho",
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 9},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT ts AS time, payload->>'no2' AS real_no2, payload->>'predictedNO2' AS pred_no2 FROM urbanpulse_history WHERE ts BETWEEN $__timeFrom() AND $__timeTo() ORDER BY ts",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "RMSE (last 7d)",
+      "gridPos": {"x": 0, "y": 9, "w": 8, "h": 4},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT sqrt(avg(power(((payload->>'no2')::float - (payload->>'predictedNO2')::float),2))) AS rmse FROM urbanpulse_history WHERE ts >= now() - interval '7 days'",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "MAE (last 7d)",
+      "gridPos": {"x": 8, "y": 9, "w": 8, "h": 4},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT avg(abs((payload->>'no2')::float - (payload->>'predictedNO2')::float)) AS mae FROM urbanpulse_history WHERE ts >= now() - interval '7 days'",
+          "format": "table"
+        }
+      ]
+    }
+  ]
+}

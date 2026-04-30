@@ -1,0 +1,43 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "correlacion-trafico-no2",
+    "title": "Correlación tráfico - NO2",
+    "panels": [],
+    "templating": { "list": [] }
+  },
+  "overwrite": true
+}
+{
+  "uid": "correlacion_trafico_no2",
+  "title": "Correlación tráfico - NO2",
+  "schemaVersion": 30,
+  "version": 1,
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Scatter: tráfico vs NO2 (per 15m)",
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 12},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT date_trunc('15 minute', ts) AS time, avg((payload->>'intensity')::float) AS traffic, avg((payload->>'no2')::float) AS no2 FROM urbanpulse_history WHERE ts BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "type": "heatmap",
+      "title": "Heatmap: hora × día de semana (NO2)",
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 12},
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT extract(dow from ts) AS dow, extract(hour from ts) AS hour, avg((payload->>'no2')::float) AS avg_no2 FROM urbanpulse_history WHERE ts BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1,2 ORDER BY 1,2",
+          "format": "table"
+        }
+      ]
+    }
+  ]
+}

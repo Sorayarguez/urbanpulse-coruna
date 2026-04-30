@@ -1,0 +1,25 @@
+apiVersion: 1
+datasources:
+  - name: CrateDB
+    type: postgres
+    access: proxy
+    url: crate:5432
+    isDefault: true
+    user: ${CRATE_PSQL_USER}
+    secureJsonData:
+      password: ${CRATE_PSQL_PASSWORD}
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1200
+apiVersion: 1
+datasources:
+  - name: CrateDB
+    type: postgres
+    access: proxy
+    url: crate:5432
+    database: doc
+    user: crate
+    secureJsonData:
+      password: crate
+    isDefault: true
+    editable: true
