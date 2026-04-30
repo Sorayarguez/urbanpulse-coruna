@@ -34,4 +34,6 @@ if FRONTEND_DIR.exists():
 
 if __name__ == "__main__":
     # Start Uvicorn with the existing FastAPI app. Bind to localhost:8000 as required.
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    host = os.getenv("LISTEN_ADDR", "0.0.0.0")
+    port = int(os.getenv("LISTEN_PORT", 8000))
+    uvicorn.run(app, host=host, port=port)
