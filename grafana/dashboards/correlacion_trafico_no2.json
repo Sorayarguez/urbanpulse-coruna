@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "id": null,
+    "uid": "correlacion-trafico-no2",
+    "title": "Correlación tráfico - NO2",
+    "panels": [],
+    "templating": { "list": [] }
+  },
+  "overwrite": true
+}
+{
   "uid": "correlacion_trafico_no2",
   "title": "Correlación tráfico - NO2",
   "schemaVersion": 30,

@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "id": null,
+    "uid": "vison-general",
+    "title": "Visión general ambiental",
+    "panels": [],
+    "templating": { "list": [] }
+  },
+  "overwrite": true
+}
+{
   "uid": "vison_general",
   "title": "Visión general ambiental",
   "schemaVersion": 30,

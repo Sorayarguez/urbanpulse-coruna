@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "id": null,
+    "uid": "alertas-anomalias",
+    "title": "Alertas y anomalías",
+    "panels": [],
+    "templating": { "list": [] }
+  },
+  "overwrite": true
+}
+{
   "uid": "alertas_anomalias",
   "title": "Alertas y anomalías",
   "schemaVersion": 30,

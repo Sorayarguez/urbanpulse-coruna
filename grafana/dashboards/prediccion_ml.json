@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "id": null,
+    "uid": "prediccion-ml",
+    "title": "Predicción ML",
+    "panels": [],
+    "templating": { "list": [] }
+  },
+  "overwrite": true
+}
+{
   "uid": "prediccion_ml",
   "title": "Predicción ML: reales vs predichos",
   "schemaVersion": 30,
